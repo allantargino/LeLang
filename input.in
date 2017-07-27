@@ -1,0 +1,5 @@
+program MyProgram {
+	int: a, b;
+	const int: c, d;
+
+}

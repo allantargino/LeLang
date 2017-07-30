@@ -1,18 +1,28 @@
-class MeuParser extends Parser;
+class LeParser extends Parser;
 options{
     k = 2;
 }
 
-prog   	: 	"program" ID "{"
+{
+   public void init(){
+       //programa = new Programa();
+       //stack    = new StackCommand();
+   }
+}
+
+program : 	"program" ID AC
 				declare
 				block
-			"}"
+			FC
+		;
+
+declare	:	(var | cte)+
 		;
 		
-declare	:	type ":" ID ("," ID)*  ";"
+var		:	type ID (VG ID)*  PV
 		;
 		
-const	:	"const" type ":" ID attr ("," ID attr)*  ";"
+cte		:	"cte" type ID attr (VG ID attr)*  PV
 		;
 
 type	:	("int" | "str"| "decimal"| "bool")
@@ -24,10 +34,10 @@ block	:	(cmd)+
 cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr | cmdExpr
 		;
 
-cmdAttr	:	ID attr ";"
+cmdAttr	:	ID attr PV
 		;
 	   
-attr	:	"=" (NUM | TEXTO)
+attr	:	IG (NUM | TEXTO)
 		;
 		
 cmdRead	:	"Read(" ID ")"
@@ -54,7 +64,7 @@ boolExpr:	boolCond (OPLOG boolCond)*
 boolCond:	(cmdExpr OPREL cmdExpr | ID)
 		;
 
-cmdStr	:	"str.Concat" "(" TEXT ("," TEXT)+ ")"
+cmdStr	:	"str.Concat" "(" TEXT (VG TEXT)+ ")"
 		;
 
 cmdExpr	: 	termo
@@ -68,14 +78,16 @@ termo  	: 	ID | NUM | TEXTO
 		;
 
 
-
-class Lexer extends Lexer;
+class LeLexer extends Lexer;
 options{
    caseSensitive = true;
 }
 
 BLANK       : (' ' | '\n' | '\r' | '\t') {_ttype=Token.SKIP;}
             ;
+
+COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.SKIP;}
+			;
         
 ID          : ('a'..'z' | 'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
             ;
@@ -91,3 +103,19 @@ OPLOG		: '&' | '|'
         
 TEXTO       : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
             ;
+
+AC	: 		'{'
+	;
+
+FC	:		'}'
+	;
+
+PV	: 		';'
+	;
+
+VG	:		','
+	;
+
+IG	:		":="
+	;
+

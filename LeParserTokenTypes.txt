@@ -1,0 +1,33 @@
+// $ANTLR 2.7.6 (2005-12-22): grammar.g -> LeParserTokenTypes.txt$
+LeParser    // output token vocab name
+LITERAL_program="program"=4
+ID=5
+AC=6
+FC=7
+VG=8
+PV=9
+LITERAL_cte="cte"=10
+LITERAL_int="int"=11
+LITERAL_str="str"=12
+LITERAL_decimal="decimal"=13
+LITERAL_bool="bool"=14
+IG=15
+NUM=16
+TEXTO=17
+"Read("=18
+")"=19
+"Write("=20
+TEXT=21
+LITERAL_if="if"=22
+"("=23
+LITERAL_endif="endif"=24
+"for("=25
+":"=26
+LITERAL_nextfor="nextfor"=27
+"while("=28
+OPLOG=29
+OPREL=30
+"str.Concat"=31
+OP=32
+BLANK=33
+COMMENT=34

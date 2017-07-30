@@ -1,0 +1,10 @@
+program MyProgram
+{
+	# declaracao de variaveis
+	int a, b;
+	cte int c:=3, d:=3;
+
+	# corpo do programa
+	a:=3; 
+
+}

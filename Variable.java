@@ -11,7 +11,7 @@ public class Variable{
         this._id   = id;
         this._type = type;
     }
-    
+
     public Variable(){
         this("", -1);
     }

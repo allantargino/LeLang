@@ -12,6 +12,7 @@ program MyProgram
 
 	a:=3+3;
 
+	# Commands
 	Read(a);
 	Write(a);
 

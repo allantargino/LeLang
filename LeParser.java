@@ -20,7 +20,8 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	// Variable Fields
 	private java.util.HashMap<String, Variable> _symbolTable; 
 	private int _varType;
-
+	
+	// Error Fields
 	private java.util.ArrayList<Error> _errorList;
 
 	public void Init(){
@@ -47,12 +48,18 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 
 	//Variable Handling Methods
 
-	private void CheckVariableIsDeclared(String varName){
+	private void CheckVariableCanBeDeclared(String varName){
 		if (_symbolTable.get(varName) == null){
 				Variable v = new Variable(varName, _varType);
 				_symbolTable.put(v.GetId(), v);
 		}else{
 			CreateError(1, "Variable " + varName +  " already declared");
+		}
+	}
+	
+	private void CheckVariableCanBeUsed(String varName){
+		if (_symbolTable.get(varName) == null){
+			CreateError(2, "Variable " + varName +  " was not declared");
 		}
 	}
 
@@ -163,14 +170,14 @@ public LeParser(ParserSharedInputState state) {
 			type();
 			_varType = Variable.GetTypeNumber(LT(0).getText());
 			match(ID);
-			CheckVariableIsDeclared(LT(0).getText());
+			CheckVariableCanBeDeclared(LT(0).getText());
 			{
 			_loop7:
 			do {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(ID);
-					CheckVariableIsDeclared(LT(0).getText());
+					CheckVariableCanBeDeclared(LT(0).getText());
 				}
 				else {
 					break _loop7;
@@ -194,7 +201,7 @@ public LeParser(ParserSharedInputState state) {
 			type();
 			_varType = Variable.GetTypeNumber(LT(0).getText());
 			match(ID);
-			CheckVariableIsDeclared(LT(0).getText());
+			CheckVariableCanBeDeclared(LT(0).getText());
 			attr();
 			{
 			_loop10:
@@ -202,7 +209,7 @@ public LeParser(ParserSharedInputState state) {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(ID);
-					CheckVariableIsDeclared(LT(0).getText());
+					CheckVariableCanBeDeclared(LT(0).getText());
 					attr();
 				}
 				else {
@@ -352,6 +359,7 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(ID);
+			CheckVariableCanBeUsed(LT(0).getText());
 			attr();
 			match(PV);
 		}
@@ -368,6 +376,7 @@ public LeParser(ParserSharedInputState state) {
 			match(LITERAL_Read);
 			match(18);
 			match(ID);
+			CheckVariableCanBeUsed(LT(0).getText());
 			match(19);
 			match(PV);
 		}
@@ -393,6 +402,7 @@ public LeParser(ParserSharedInputState state) {
 			case ID:
 			{
 				match(ID);
+				CheckVariableCanBeUsed(LT(0).getText());
 				break;
 			}
 			default:
@@ -570,6 +580,7 @@ public LeParser(ParserSharedInputState state) {
 			}
 			else if ((LA(1)==ID) && (LA(2)==19||LA(2)==FP||LA(2)==OPLOG)) {
 				match(ID);
+				CheckVariableCanBeUsed(LT(0).getText());
 			}
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
@@ -591,6 +602,7 @@ public LeParser(ParserSharedInputState state) {
 			case ID:
 			{
 				match(ID);
+				CheckVariableCanBeUsed(LT(0).getText());
 				break;
 			}
 			case NUM:

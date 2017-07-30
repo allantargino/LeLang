@@ -7,7 +7,8 @@ options{
 	// Variable Fields
 	private java.util.HashMap<String, Variable> _symbolTable; 
 	private int _varType;
-
+	
+	// Error Fields
 	private java.util.ArrayList<Error> _errorList;
 
 	public void Init(){
@@ -34,12 +35,18 @@ options{
 
 	//Variable Handling Methods
 
-	private void CheckVariableIsDeclared(String varName){
+	private void CheckVariableCanBeDeclared(String varName){
 		if (_symbolTable.get(varName) == null){
 				Variable v = new Variable(varName, _varType);
 				_symbolTable.put(v.GetId(), v);
 		}else{
 			CreateError(1, "Variable " + varName +  " already declared");
+		}
+	}
+	
+	private void CheckVariableCanBeUsed(String varName){
+		if (_symbolTable.get(varName) == null){
+			CreateError(2, "Variable " + varName +  " was not declared");
 		}
 	}
 }
@@ -55,20 +62,20 @@ declare	:	(var | cte)+
 		;
 		
 var		:	type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
-			ID {CheckVariableIsDeclared(LT(0).getText());}
+			ID {CheckVariableCanBeDeclared(LT(0).getText());}
 			(
 				VG
-				ID {CheckVariableIsDeclared(LT(0).getText());}
+				ID {CheckVariableCanBeDeclared(LT(0).getText());}
 			)*
 			PV
 		;
 		
 cte		:	"cte" type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
-			ID {CheckVariableIsDeclared(LT(0).getText());}
+			ID {CheckVariableCanBeDeclared(LT(0).getText());}
 			attr
 			(
 				VG
-				ID {CheckVariableIsDeclared(LT(0).getText());}
+				ID {CheckVariableCanBeDeclared(LT(0).getText());}
 				attr
 			)*
 			PV
@@ -83,16 +90,27 @@ block	:	(cmd)*
 cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr
 		;
 
-cmdAttr	:	ID attr PV
+cmdAttr	:	ID { CheckVariableCanBeUsed(LT(0).getText());}
+			attr
+			PV
 		;
 	   
 attr	:	IG (cmdExpr | TEXTO | boolVal)
 		;
 		
-cmdRead	:	"Read" "(" ID ")" PV
+cmdRead	:	"Read" "("
+				ID { CheckVariableCanBeUsed(LT(0).getText());}
+			")"
+			PV
 		;
 
-cmdWrite:	"Write" "(" (TEXT | ID) ")" PV
+cmdWrite:	"Write" "("
+			(
+				TEXT
+				|
+				ID { CheckVariableCanBeUsed(LT(0).getText());}
+			) ")"
+			PV
 		;
 		
 cmdIf	:	"if" "(" boolExpr ")"
@@ -111,7 +129,11 @@ cmdWhile:	"while" AP boolExpr FP
 boolExpr:	boolCond (OPLOG boolCond)*
 		;
 		
-boolCond:	(cmdExpr OPREL cmdExpr | ID)
+boolCond:	(
+				cmdExpr OPREL cmdExpr
+				|
+				ID { CheckVariableCanBeUsed(LT(0).getText());}
+			)
 		;
 
 boolVal	:	("true" | "false")
@@ -127,7 +149,9 @@ cmdExpr	: 	termo
 exprl  	:  	(OP termo)*
 		;
        
-termo  	: 	ID | NUM 
+termo  	: 	ID { CheckVariableCanBeUsed(LT(0).getText());}
+			|
+			NUM 
 		;
 
 
@@ -148,8 +172,11 @@ COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.
 ID          : ('a'..'z' | 'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
             ;
         
-NUM         : ('0'..'9')+ ('.' ('0'..'9')+)?
+NUM         : ('0'..'9')+
             ;
+
+NUM_DEC		: ('0'..'9')+ ('.' ('0'..'9')+)? 'd'
+			;
         
 OPREL       : '>' | '<' | "=="
             ;
@@ -158,27 +185,28 @@ OPLOG		: '&' | '|'
 			;
 
 OP			: '+' | '-'
-        
+			;
+			
 TEXTO       : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
             ;
 
-AC	: 		'{'
-	;
-
-FC	:		'}'
-	;
-
-AP	:		'('
-	;
-
-FP	:		')'
-	;
-
-PV	: 		';'
-	;
-
-VG	:		','
-	;
-
-IG	:		":="
-	;
+AC			: 	'{'
+			;
+		
+FC			:	'}'
+			;
+		
+AP			:	'('
+			;
+		
+FP			:	')'
+			;
+		
+PV			: 	';'
+			;
+		
+VG			:	','
+			;
+		
+IG			:	":="
+			;

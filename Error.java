@@ -20,7 +20,7 @@ public class Error{
     }
 
     public String toString(){
-        return "LE" + this._code + ": " +  this._message;
+        return "LE_" + this._code + ": " +  this._message;
     }
 
 }

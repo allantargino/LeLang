@@ -19,13 +19,28 @@ public class Variable{
     public void SetId(String id){
         this._id = id;
     }
-    public void Settype(int type){
+    public void SetType(int type){
         this._type = type;
+    }
+
+    public static int GetTypeNumber(String type){
+        switch(type.toUpperCase()){
+            case "INT":
+                return INTEGER;
+            case "DECIMAL":
+                return DECIMAL;
+            case "STR":
+                return STRING;
+            case "BOOL":
+                return BOOLEAN;
+            default:
+                throw new RuntimeException("Variable not supported.");
+        }
     }
     public String GetId(){
         return this._id;
     }
-    public int Gettype(){
+    public int GetType(){
         return this._type;
     }
     

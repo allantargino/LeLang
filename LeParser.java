@@ -17,8 +17,9 @@ import antlr.collections.impl.BitSet;
 public class LeParser extends antlr.LLkParser       implements LeParserTokenTypes
  {
 
+	// Variable Fields
 	private java.util.HashMap<String, Variable> _symbolTable; 
-	private java.util.ArrayList<Variable> _tempVarList;
+	private int _varType;
 
 	private java.util.ArrayList<Error> _errorList;
 
@@ -31,19 +32,28 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		_errorList = new java.util.ArrayList<Error>();
 	}
 
-	public void ErrorHandling(){
 
+	//Error Handling Methods
+
+	private void CreateError(int code, String message){
+		Error e = new Error(code, message);
+		_errorList.add(e);
 	}
 
+	public void ErrorHandling(){
+		for (Error e: _errorList) System.out.println(e.toString());
+		//TODO: Save in a output file
+	}
 
+	//Variable Handling Methods
 
-	private void CheckVariable(){
-		if (_symbolTable.get(LT(0).getText()) == null){
-				Variable v = new Variable();
-				v.SetId(LT(0).getText());
+	private void CheckVariableIsDeclared(String varName){
+		if (_symbolTable.get(varName) == null){
+				Variable v = new Variable(varName, _varType);
 				_symbolTable.put(v.GetId(), v);
-				_tempVarList.add(v);
-		}   
+		}else{
+			CreateError(1, "Variable " + varName +  " already declared");
+		}
 	}
 
 protected LeParser(TokenBuffer tokenBuf, int k) {
@@ -96,8 +106,8 @@ public LeParser(ParserSharedInputState state) {
 			do {
 				switch ( LA(1)) {
 				case LITERAL_int:
-				case LITERAL_str:
 				case LITERAL_decimal:
+				case LITERAL_str:
 				case LITERAL_bool:
 				{
 					var();
@@ -151,16 +161,16 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			type();
-			_tempVarList = new java.util.ArrayList<Variable>();
+			_varType = Variable.GetTypeNumber(LT(0).getText());
 			match(ID);
-			CheckVariable();
+			CheckVariableIsDeclared(LT(0).getText());
 			{
 			_loop7:
 			do {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(ID);
-					CheckVariable();
+					CheckVariableIsDeclared(LT(0).getText());
 				}
 				else {
 					break _loop7;
@@ -182,7 +192,9 @@ public LeParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_cte);
 			type();
+			_varType = Variable.GetTypeNumber(LT(0).getText());
 			match(ID);
+			CheckVariableIsDeclared(LT(0).getText());
 			attr();
 			{
 			_loop10:
@@ -190,6 +202,7 @@ public LeParser(ParserSharedInputState state) {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(ID);
+					CheckVariableIsDeclared(LT(0).getText());
 					attr();
 				}
 				else {
@@ -217,14 +230,14 @@ public LeParser(ParserSharedInputState state) {
 				match(LITERAL_int);
 				break;
 			}
-			case LITERAL_str:
-			{
-				match(LITERAL_str);
-				break;
-			}
 			case LITERAL_decimal:
 			{
 				match(LITERAL_decimal);
+				break;
+			}
+			case LITERAL_str:
+			{
+				match(LITERAL_str);
 				break;
 			}
 			case LITERAL_bool:
@@ -252,9 +265,10 @@ public LeParser(ParserSharedInputState state) {
 			match(IG);
 			{
 			switch ( LA(1)) {
+			case ID:
 			case NUM:
 			{
-				match(NUM);
+				cmdExpr();
 				break;
 			}
 			case TEXTO:
@@ -286,6 +300,11 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			switch ( LA(1)) {
+			case ID:
+			{
+				cmdAttr();
+				break;
+			}
 			case LITERAL_Read:
 			{
 				cmdRead();
@@ -317,20 +336,14 @@ public LeParser(ParserSharedInputState state) {
 				break;
 			}
 			default:
-				if ((LA(1)==ID) && (LA(2)==IG)) {
-					cmdAttr();
-				}
-				else if ((LA(1)==ID||LA(1)==NUM||LA(1)==TEXTO) && (_tokenSet_7.member(LA(2)))) {
-					cmdExpr();
-				}
-			else {
+			{
 				throw new NoViableAltException(LT(1), getFilename());
 			}
 			}
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -344,7 +357,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -353,14 +366,14 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_Read);
-			match(19);
+			match(18);
 			match(ID);
-			match(20);
+			match(19);
 			match(PV);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -369,7 +382,7 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_Write);
-			match(19);
+			match(18);
 			{
 			switch ( LA(1)) {
 			case TEXT:
@@ -388,12 +401,12 @@ public LeParser(ParserSharedInputState state) {
 			}
 			}
 			}
-			match(20);
+			match(19);
 			match(PV);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -402,15 +415,15 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_if);
-			match(19);
+			match(18);
 			boolExpr();
-			match(20);
+			match(19);
 			block();
 			match(LITERAL_endif);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -428,7 +441,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -444,7 +457,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -453,7 +466,7 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(35);
-			match(19);
+			match(18);
 			match(TEXT);
 			{
 			int _cnt35=0;
@@ -470,11 +483,11 @@ public LeParser(ParserSharedInputState state) {
 				_cnt35++;
 			} while (true);
 			}
-			match(20);
+			match(19);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_7);
 		}
 	}
 	
@@ -487,7 +500,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_9);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -541,7 +554,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_10);
+			recover(ex,_tokenSet_9);
 		}
 	}
 	
@@ -550,12 +563,12 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			{
-			if ((LA(1)==ID||LA(1)==NUM||LA(1)==TEXTO) && (LA(2)==OPREL||LA(2)==OP)) {
+			if ((LA(1)==ID||LA(1)==NUM) && (LA(2)==OPREL||LA(2)==OP)) {
 				cmdExpr();
 				match(OPREL);
 				cmdExpr();
 			}
-			else if ((LA(1)==ID) && (LA(2)==20||LA(2)==FP||LA(2)==OPLOG)) {
+			else if ((LA(1)==ID) && (LA(2)==19||LA(2)==FP||LA(2)==OPLOG)) {
 				match(ID);
 			}
 			else {
@@ -566,7 +579,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_11);
+			recover(ex,_tokenSet_10);
 		}
 	}
 	
@@ -585,11 +598,6 @@ public LeParser(ParserSharedInputState state) {
 				match(NUM);
 				break;
 			}
-			case TEXTO:
-			{
-				match(TEXTO);
-				break;
-			}
 			default:
 			{
 				throw new NoViableAltException(LT(1), getFilename());
@@ -598,7 +606,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_12);
+			recover(ex,_tokenSet_11);
 		}
 	}
 	
@@ -622,7 +630,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_9);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -640,11 +648,10 @@ public LeParser(ParserSharedInputState state) {
 		"PV",
 		"\"cte\"",
 		"\"int\"",
-		"\"str\"",
 		"\"decimal\"",
+		"\"str\"",
 		"\"bool\"",
 		"IG",
-		"NUM",
 		"TEXTO",
 		"\"Read\"",
 		"\"(\"",
@@ -655,6 +662,7 @@ public LeParser(ParserSharedInputState state) {
 		"\"endif\"",
 		"\"for\"",
 		"AP",
+		"NUM",
 		"\":\"",
 		"FP",
 		"\"nextfor\"",
@@ -677,22 +685,22 @@ public LeParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 35477979296L, 0L};
+		long[] data = { 35455631520L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 35477979168L, 0L};
+		long[] data = { 35455631392L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 16777344L, 0L};
+		long[] data = { 8388736L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 35478011040L, 0L};
+		long[] data = { 35455663264L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -707,34 +715,29 @@ public LeParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 104214233248L, 0L};
+		long[] data = { 35464020128L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 35494756512L, 0L};
+		long[] data = { 6711411456L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
 	private static final long[] mk_tokenSet_9() {
-		long[] data = { 42206691488L, 0L};
+		long[] data = { 268959744L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
 	private static final long[] mk_tokenSet_10() {
-		long[] data = { 269484032L, 0L};
+		long[] data = { 2416443392L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
 	private static final long[] mk_tokenSet_11() {
-		long[] data = { 2416967680L, 0L};
+		long[] data = { 75430888192L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
-	private static final long[] mk_tokenSet_12() {
-		long[] data = { 110926168224L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_12 = new BitSet(mk_tokenSet_12());
 	
 	}

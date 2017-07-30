@@ -4,8 +4,9 @@ options{
 }
 
 {
+	// Variable Fields
 	private java.util.HashMap<String, Variable> _symbolTable; 
-	private java.util.ArrayList<Variable> _tempVarList;
+	private int _varType;
 
 	private java.util.ArrayList<Error> _errorList;
 
@@ -18,19 +19,28 @@ options{
 		_errorList = new java.util.ArrayList<Error>();
 	}
 
-	public void ErrorHandling(){
 
+	//Error Handling Methods
+
+	private void CreateError(int code, String message){
+		Error e = new Error(code, message);
+		_errorList.add(e);
 	}
 
+	public void ErrorHandling(){
+		for (Error e: _errorList) System.out.println(e.toString());
+		//TODO: Save in a output file
+	}
 
+	//Variable Handling Methods
 
-	private void CheckVariable(){
-		if (_symbolTable.get(LT(0).getText()) == null){
-				Variable v = new Variable();
-				v.SetId(LT(0).getText());
+	private void CheckVariableIsDeclared(String varName){
+		if (_symbolTable.get(varName) == null){
+				Variable v = new Variable(varName, _varType);
 				_symbolTable.put(v.GetId(), v);
-				_tempVarList.add(v);
-		}   
+		}else{
+			CreateError(1, "Variable " + varName +  " already declared");
+		}
 	}
 }
 
@@ -44,31 +54,39 @@ program : 	"program" ID "{"
 declare	:	(var | cte)+
 		;
 		
-var		:	type { _tempVarList = new java.util.ArrayList<Variable>(); }
-			ID {CheckVariable();}
+var		:	type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
+			ID {CheckVariableIsDeclared(LT(0).getText());}
 			(
 				VG
-				ID {CheckVariable();}
+				ID {CheckVariableIsDeclared(LT(0).getText());}
 			)*
 			PV
 		;
 		
-cte		:	"cte" type ID attr (VG ID attr)*  PV
+cte		:	"cte" type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
+			ID {CheckVariableIsDeclared(LT(0).getText());}
+			attr
+			(
+				VG
+				ID {CheckVariableIsDeclared(LT(0).getText());}
+				attr
+			)*
+			PV
 		;
 
-type	:	("int" | "str"| "decimal"| "bool")
+type	:	("int" | "decimal"| "str"| "bool")
 		;
 		
 block	:	(cmd)*
 		;
 
-cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr | cmdExpr
+cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr
 		;
 
 cmdAttr	:	ID attr PV
 		;
 	   
-attr	:	IG (NUM | TEXTO | boolVal)
+attr	:	IG (cmdExpr | TEXTO | boolVal)
 		;
 		
 cmdRead	:	"Read" "(" ID ")" PV
@@ -109,8 +127,11 @@ cmdExpr	: 	termo
 exprl  	:  	(OP termo)*
 		;
        
-termo  	: 	ID | NUM | TEXTO
+termo  	: 	ID | NUM 
 		;
+
+
+
 
 
 class LeLexer extends Lexer;
@@ -135,6 +156,8 @@ OPREL       : '>' | '<' | "=="
 			
 OPLOG		: '&' | '|'
 			;
+
+OP			: '+' | '-'
         
 TEXTO       : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
             ;

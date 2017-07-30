@@ -41,26 +41,26 @@ public LeLexer(LexerSharedInputState state) {
 	setCaseSensitive(true);
 	literals = new Hashtable();
 	literals.put(new ANTLRHashString("nextfor", this), new Integer(29));
-	literals.put(new ANTLRHashString("Write", this), new Integer(21));
-	literals.put(new ANTLRHashString("for", this), new Integer(25));
-	literals.put(new ANTLRHashString("if", this), new Integer(23));
+	literals.put(new ANTLRHashString("Write", this), new Integer(20));
+	literals.put(new ANTLRHashString("for", this), new Integer(24));
+	literals.put(new ANTLRHashString("if", this), new Integer(22));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
 	literals.put(new ANTLRHashString("while", this), new Integer(30));
-	literals.put(new ANTLRHashString(")", this), new Integer(20));
-	literals.put(new ANTLRHashString("Read", this), new Integer(18));
+	literals.put(new ANTLRHashString(")", this), new Integer(19));
+	literals.put(new ANTLRHashString("Read", this), new Integer(17));
 	literals.put(new ANTLRHashString("str.Concat", this), new Integer(35));
-	literals.put(new ANTLRHashString("endif", this), new Integer(24));
+	literals.put(new ANTLRHashString("endif", this), new Integer(23));
 	literals.put(new ANTLRHashString("{", this), new Integer(6));
 	literals.put(new ANTLRHashString("cte", this), new Integer(10));
-	literals.put(new ANTLRHashString("(", this), new Integer(19));
+	literals.put(new ANTLRHashString("(", this), new Integer(18));
 	literals.put(new ANTLRHashString("true", this), new Integer(33));
 	literals.put(new ANTLRHashString(":", this), new Integer(27));
 	literals.put(new ANTLRHashString("bool", this), new Integer(14));
-	literals.put(new ANTLRHashString("decimal", this), new Integer(13));
+	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
 	literals.put(new ANTLRHashString("int", this), new Integer(11));
 	literals.put(new ANTLRHashString("false", this), new Integer(34));
 	literals.put(new ANTLRHashString("}", this), new Integer(7));
-	literals.put(new ANTLRHashString("str", this), new Integer(12));
+	literals.put(new ANTLRHashString("str", this), new Integer(13));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -123,9 +123,9 @@ tryAgain:
 					theRetToken=_returnToken;
 					break;
 				}
-				case '"':
+				case '+':  case '-':
 				{
-					mTEXTO(true);
+					mOP(true);
 					theRetToken=_returnToken;
 					break;
 				}
@@ -496,58 +496,76 @@ tryAgain:
 		_returnToken = _token;
 	}
 	
-	public final void mTEXTO(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+	public final void mOP(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
 		int _ttype; Token _token=null; int _begin=text.length();
-		_ttype = TEXTO;
+		_ttype = OP;
 		int _saveIndex;
+		char  TEXTO = '\0';
 		
-		match('"');
+		switch ( LA(1)) {
+		case '+':
 		{
-		_loop60:
-		do {
-			switch ( LA(1)) {
-			case 'a':  case 'b':  case 'c':  case 'd':
-			case 'e':  case 'f':  case 'g':  case 'h':
-			case 'i':  case 'j':  case 'k':  case 'l':
-			case 'm':  case 'n':  case 'o':  case 'p':
-			case 'q':  case 'r':  case 's':  case 't':
-			case 'u':  case 'v':  case 'w':  case 'x':
-			case 'y':  case 'z':
-			{
-				matchRange('a','z');
-				break;
-			}
-			case 'A':  case 'B':  case 'C':  case 'D':
-			case 'E':  case 'F':  case 'G':  case 'H':
-			case 'I':  case 'J':  case 'K':  case 'L':
-			case 'M':  case 'N':  case 'O':  case 'P':
-			case 'Q':  case 'R':  case 'S':  case 'T':
-			case 'U':  case 'V':  case 'W':  case 'X':
-			case 'Y':  case 'Z':
-			{
-				matchRange('A','Z');
-				break;
-			}
-			case ' ':
-			{
-				match(' ');
-				break;
-			}
-			case '0':  case '1':  case '2':  case '3':
-			case '4':  case '5':  case '6':  case '7':
-			case '8':  case '9':
-			{
-				matchRange('0','9');
-				break;
-			}
-			default:
-			{
-				break _loop60;
-			}
-			}
-		} while (true);
+			match('+');
+			break;
 		}
-		match('"');
+		case '-':
+		{
+			match('-');
+			TEXTO = LA(1);
+			match('"');
+			{
+			_loop60:
+			do {
+				switch ( LA(1)) {
+				case 'a':  case 'b':  case 'c':  case 'd':
+				case 'e':  case 'f':  case 'g':  case 'h':
+				case 'i':  case 'j':  case 'k':  case 'l':
+				case 'm':  case 'n':  case 'o':  case 'p':
+				case 'q':  case 'r':  case 's':  case 't':
+				case 'u':  case 'v':  case 'w':  case 'x':
+				case 'y':  case 'z':
+				{
+					matchRange('a','z');
+					break;
+				}
+				case 'A':  case 'B':  case 'C':  case 'D':
+				case 'E':  case 'F':  case 'G':  case 'H':
+				case 'I':  case 'J':  case 'K':  case 'L':
+				case 'M':  case 'N':  case 'O':  case 'P':
+				case 'Q':  case 'R':  case 'S':  case 'T':
+				case 'U':  case 'V':  case 'W':  case 'X':
+				case 'Y':  case 'Z':
+				{
+					matchRange('A','Z');
+					break;
+				}
+				case ' ':
+				{
+					match(' ');
+					break;
+				}
+				case '0':  case '1':  case '2':  case '3':
+				case '4':  case '5':  case '6':  case '7':
+				case '8':  case '9':
+				{
+					matchRange('0','9');
+					break;
+				}
+				default:
+				{
+					break _loop60;
+				}
+				}
+			} while (true);
+			}
+			match('"');
+			break;
+		}
+		default:
+		{
+			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
+		}
+		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));

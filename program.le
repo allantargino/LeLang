@@ -1,14 +1,16 @@
 program MyProgram
 {
-	# declaracao de variaveis
+	# variable declaration
 	int a, b;
 	bool f;
 	cte int c:=3, d:=3;
 
-	# corpo do programa
+	# program body
 	a:=3;
 	b:=5;
 	f:=true;
+
+	a:=3+3;
 
 	Read(a);
 	Write(a);

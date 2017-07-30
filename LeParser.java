@@ -17,10 +17,34 @@ import antlr.collections.impl.BitSet;
 public class LeParser extends antlr.LLkParser       implements LeParserTokenTypes
  {
 
-   public void init(){
-       //programa = new Programa();
-       //stack    = new StackCommand();
-   }
+	private java.util.HashMap<String, Variable> _symbolTable; 
+	private java.util.ArrayList<Variable> _tempVarList;
+
+	private java.util.ArrayList<Error> _errorList;
+
+	public void Init(){
+		//programa = new Programa();
+		//stack    = new StackCommand();
+
+		_symbolTable = new java.util.HashMap<String, Variable>(); 
+
+		_errorList = new java.util.ArrayList<Error>();
+	}
+
+	public void ErrorHandling(){
+
+	}
+
+
+
+	private void CheckVariable(){
+		if (_symbolTable.get(LT(0).getText()) == null){
+				Variable v = new Variable();
+				v.SetId(LT(0).getText());
+				_symbolTable.put(v.GetId(), v);
+				_tempVarList.add(v);
+		}   
+	}
 
 protected LeParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
@@ -51,10 +75,10 @@ public LeParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_program);
 			match(ID);
-			match(AC);
+			match(6);
 			declare();
 			block();
-			match(FC);
+			match(7);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -104,23 +128,21 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			{
-			int _cnt15=0;
 			_loop15:
 			do {
-				if ((_tokenSet_1.member(LA(1)))) {
+				if ((_tokenSet_2.member(LA(1)))) {
 					cmd();
 				}
 				else {
-					if ( _cnt15>=1 ) { break _loop15; } else {throw new NoViableAltException(LT(1), getFilename());}
+					break _loop15;
 				}
 				
-				_cnt15++;
 			} while (true);
 			}
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_2);
+			recover(ex,_tokenSet_3);
 		}
 	}
 	
@@ -129,13 +151,16 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			type();
+			_tempVarList = new java.util.ArrayList<Variable>();
 			match(ID);
+			CheckVariable();
 			{
 			_loop7:
 			do {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(ID);
+					CheckVariable();
 				}
 				else {
 					break _loop7;
@@ -147,7 +172,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_3);
+			recover(ex,_tokenSet_4);
 		}
 	}
 	
@@ -177,7 +202,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_3);
+			recover(ex,_tokenSet_4);
 		}
 	}
 	
@@ -216,7 +241,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_4);
+			recover(ex,_tokenSet_5);
 		}
 	}
 	
@@ -237,6 +262,12 @@ public LeParser(ParserSharedInputState state) {
 				match(TEXTO);
 				break;
 			}
+			case LITERAL_true:
+			case LITERAL_false:
+			{
+				boolVal();
+				break;
+			}
 			default:
 			{
 				throw new NoViableAltException(LT(1), getFilename());
@@ -246,7 +277,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_5);
+			recover(ex,_tokenSet_6);
 		}
 	}
 	
@@ -255,12 +286,12 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			switch ( LA(1)) {
-			case 18:
+			case LITERAL_Read:
 			{
 				cmdRead();
 				break;
 			}
-			case 20:
+			case LITERAL_Write:
 			{
 				cmdWrite();
 				break;
@@ -270,17 +301,17 @@ public LeParser(ParserSharedInputState state) {
 				cmdIf();
 				break;
 			}
-			case 25:
+			case LITERAL_for:
 			{
 				cmdFor();
 				break;
 			}
-			case 28:
+			case LITERAL_while:
 			{
 				cmdWhile();
 				break;
 			}
-			case 31:
+			case 35:
 			{
 				cmdStr();
 				break;
@@ -289,7 +320,7 @@ public LeParser(ParserSharedInputState state) {
 				if ((LA(1)==ID) && (LA(2)==IG)) {
 					cmdAttr();
 				}
-				else if ((LA(1)==ID||LA(1)==NUM||LA(1)==TEXTO) && (_tokenSet_6.member(LA(2)))) {
+				else if ((LA(1)==ID||LA(1)==NUM||LA(1)==TEXTO) && (_tokenSet_7.member(LA(2)))) {
 					cmdExpr();
 				}
 			else {
@@ -299,7 +330,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -313,7 +344,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -321,13 +352,15 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(18);
-			match(ID);
+			match(LITERAL_Read);
 			match(19);
+			match(ID);
+			match(20);
+			match(PV);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -335,7 +368,8 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(20);
+			match(LITERAL_Write);
+			match(19);
 			{
 			switch ( LA(1)) {
 			case TEXT:
@@ -354,11 +388,12 @@ public LeParser(ParserSharedInputState state) {
 			}
 			}
 			}
-			match(19);
+			match(20);
+			match(PV);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -367,14 +402,15 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_if);
-			match(23);
-			boolExpr();
 			match(19);
+			boolExpr();
+			match(20);
+			block();
 			match(LITERAL_endif);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -382,16 +418,17 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(25);
+			match(LITERAL_for);
+			match(AP);
 			match(NUM);
-			match(26);
+			match(27);
 			match(NUM);
-			match(19);
+			match(FP);
 			match(LITERAL_nextfor);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -399,14 +436,15 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(28);
+			match(LITERAL_while);
+			match(AP);
 			boolExpr();
-			match(19);
+			match(FP);
 			match(LITERAL_nextfor);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -414,29 +452,29 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
-			match(31);
-			match(23);
+			match(35);
+			match(19);
 			match(TEXT);
 			{
-			int _cnt33=0;
-			_loop33:
+			int _cnt35=0;
+			_loop35:
 			do {
 				if ((LA(1)==VG)) {
 					match(VG);
 					match(TEXT);
 				}
 				else {
-					if ( _cnt33>=1 ) { break _loop33; } else {throw new NoViableAltException(LT(1), getFilename());}
+					if ( _cnt35>=1 ) { break _loop35; } else {throw new NoViableAltException(LT(1), getFilename());}
 				}
 				
-				_cnt33++;
+				_cnt35++;
 			} while (true);
 			}
-			match(19);
+			match(20);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_7);
+			recover(ex,_tokenSet_8);
 		}
 	}
 	
@@ -449,7 +487,36 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_9);
+		}
+	}
+	
+	public final void boolVal() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			{
+			switch ( LA(1)) {
+			case LITERAL_true:
+			{
+				match(LITERAL_true);
+				break;
+			}
+			case LITERAL_false:
+			{
+				match(LITERAL_false);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_6);
 		}
 	}
 	
@@ -474,7 +541,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_9);
+			recover(ex,_tokenSet_10);
 		}
 	}
 	
@@ -488,7 +555,7 @@ public LeParser(ParserSharedInputState state) {
 				match(OPREL);
 				cmdExpr();
 			}
-			else if ((LA(1)==ID) && (LA(2)==19||LA(2)==OPLOG)) {
+			else if ((LA(1)==ID) && (LA(2)==20||LA(2)==FP||LA(2)==OPLOG)) {
 				match(ID);
 			}
 			else {
@@ -499,7 +566,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_10);
+			recover(ex,_tokenSet_11);
 		}
 	}
 	
@@ -531,7 +598,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_11);
+			recover(ex,_tokenSet_12);
 		}
 	}
 	
@@ -540,14 +607,14 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			{
-			_loop37:
+			_loop39:
 			do {
 				if ((LA(1)==OP)) {
 					match(OP);
 					termo();
 				}
 				else {
-					break _loop37;
+					break _loop39;
 				}
 				
 			} while (true);
@@ -555,7 +622,7 @@ public LeParser(ParserSharedInputState state) {
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
-			recover(ex,_tokenSet_8);
+			recover(ex,_tokenSet_9);
 		}
 	}
 	
@@ -567,8 +634,8 @@ public LeParser(ParserSharedInputState state) {
 		"NULL_TREE_LOOKAHEAD",
 		"\"program\"",
 		"ID",
-		"AC",
-		"FC",
+		"\"{\"",
+		"\"}\"",
 		"VG",
 		"PV",
 		"\"cte\"",
@@ -579,23 +646,29 @@ public LeParser(ParserSharedInputState state) {
 		"IG",
 		"NUM",
 		"TEXTO",
-		"\"Read(\"",
+		"\"Read\"",
+		"\"(\"",
 		"\")\"",
-		"\"Write(\"",
+		"\"Write\"",
 		"TEXT",
 		"\"if\"",
-		"\"(\"",
 		"\"endif\"",
-		"\"for(\"",
+		"\"for\"",
+		"AP",
 		"\":\"",
+		"FP",
 		"\"nextfor\"",
-		"\"while(\"",
+		"\"while\"",
 		"OPLOG",
 		"OPREL",
+		"\"true\"",
+		"\"false\"",
 		"\"str.Concat\"",
 		"OP",
 		"BLANK",
-		"COMMENT"
+		"COMMENT",
+		"AC",
+		"FC"
 	};
 	
 	private static final long[] mk_tokenSet_0() {
@@ -604,59 +677,64 @@ public LeParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 2455175200L, 0L};
+		long[] data = { 35477979296L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 128L, 0L};
+		long[] data = { 35477979168L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 2455206944L, 0L};
+		long[] data = { 16777344L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 32L, 0L};
+		long[] data = { 35478011040L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
 	private static final long[] mk_tokenSet_5() {
-		long[] data = { 768L, 0L};
+		long[] data = { 32L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
 	private static final long[] mk_tokenSet_6() {
-		long[] data = { 6750142624L, 0L};
+		long[] data = { 768L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 2455175328L, 0L};
+		long[] data = { 104214233248L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 4066312352L, 0L};
+		long[] data = { 35494756512L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
 	private static final long[] mk_tokenSet_9() {
-		long[] data = { 524288L, 0L};
+		long[] data = { 42206691488L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
 	private static final long[] mk_tokenSet_10() {
-		long[] data = { 537395200L, 0L};
+		long[] data = { 269484032L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
 	private static final long[] mk_tokenSet_11() {
-		long[] data = { 8361279648L, 0L};
+		long[] data = { 2416967680L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
+	private static final long[] mk_tokenSet_12() {
+		long[] data = { 110926168224L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_12 = new BitSet(mk_tokenSet_12());
 	
 	}

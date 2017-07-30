@@ -4,8 +4,9 @@ public class MainClass{
         try{
             LeLexer lexer   = new LeLexer(new FileInputStream(new File("program.le")));
             LeParser parser = new LeParser(lexer);
-            parser.init();
+            parser.Init();
             parser.program();
+            parser.ErrorHandling();
         }
         catch(Exception ex){
             ex.printStackTrace();

@@ -4,22 +4,53 @@ options{
 }
 
 {
-   public void init(){
-       //programa = new Programa();
-       //stack    = new StackCommand();
-   }
+	private java.util.HashMap<String, Variable> _symbolTable; 
+	private java.util.ArrayList<Variable> _tempVarList;
+
+	private java.util.ArrayList<Error> _errorList;
+
+	public void Init(){
+		//programa = new Programa();
+		//stack    = new StackCommand();
+
+		_symbolTable = new java.util.HashMap<String, Variable>(); 
+
+		_errorList = new java.util.ArrayList<Error>();
+	}
+
+	public void ErrorHandling(){
+
+	}
+
+
+
+	private void CheckVariable(){
+		if (_symbolTable.get(LT(0).getText()) == null){
+				Variable v = new Variable();
+				v.SetId(LT(0).getText());
+				_symbolTable.put(v.GetId(), v);
+				_tempVarList.add(v);
+		}   
+	}
 }
 
-program : 	"program" ID AC
+
+program : 	"program" ID "{"
 				declare
 				block
-			FC
+			"}"
 		;
 
 declare	:	(var | cte)+
 		;
 		
-var		:	type ID (VG ID)*  PV
+var		:	type { _tempVarList = new java.util.ArrayList<Variable>(); }
+			ID {CheckVariable();}
+			(
+				VG
+				ID {CheckVariable();}
+			)*
+			PV
 		;
 		
 cte		:	"cte" type ID attr (VG ID attr)*  PV
@@ -28,7 +59,7 @@ cte		:	"cte" type ID attr (VG ID attr)*  PV
 type	:	("int" | "str"| "decimal"| "bool")
 		;
 		
-block	:	(cmd)+
+block	:	(cmd)*
 		;
 
 cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr | cmdExpr
@@ -37,24 +68,25 @@ cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr | cmdEx
 cmdAttr	:	ID attr PV
 		;
 	   
-attr	:	IG (NUM | TEXTO)
+attr	:	IG (NUM | TEXTO | boolVal)
 		;
 		
-cmdRead	:	"Read(" ID ")"
+cmdRead	:	"Read" "(" ID ")" PV
 		;
 
-cmdWrite:	"Write(" (TEXT | ID) ")"
+cmdWrite:	"Write" "(" (TEXT | ID) ")" PV
 		;
 		
 cmdIf	:	"if" "(" boolExpr ")"
+				block
 			"endif"
 		;
 		
-cmdFor	:	"for(" NUM ":" NUM ")"
+cmdFor	:	"for" AP NUM ":" NUM FP
 			"nextfor"
 		;
 		
-cmdWhile:	"while(" boolExpr")"
+cmdWhile:	"while" AP boolExpr FP
 			"nextfor"
 		;
 		
@@ -62,6 +94,9 @@ boolExpr:	boolCond (OPLOG boolCond)*
 		;
 		
 boolCond:	(cmdExpr OPREL cmdExpr | ID)
+		;
+
+boolVal	:	("true" | "false")
 		;
 
 cmdStr	:	"str.Concat" "(" TEXT (VG TEXT)+ ")"
@@ -110,6 +145,12 @@ AC	: 		'{'
 FC	:		'}'
 	;
 
+AP	:		'('
+	;
+
+FP	:		')'
+	;
+
 PV	: 		';'
 	;
 
@@ -118,4 +159,3 @@ VG	:		','
 
 IG	:		":="
 	;
-

@@ -34,7 +34,10 @@ options{
 	}
 
 	public void ErrorHandling(){
-		for (Error e: _errorList) System.out.println(e.toString());
+		if(_errorList.size() > 0)
+			for (Error e: _errorList) System.out.println(e.toString());
+		else
+			System.out.println("ANALYSIS WITHOUT ERRORS");
 		//TODO: Save in a output file
 	}
 
@@ -61,11 +64,15 @@ options{
 		}
 	}
 
+	private Boolean NumberIsDecimal(String tokenNumber){
+		return tokenNumber.contains("f");
+	}
+
 
 	//Variable Assignment Methods
 	
 	private void CheckVariableAssignment(){
-		if(_varFrom != _varTo.GetType()){
+		if(_varFrom > _varTo.GetType()){
 			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types.");
 		}
 	}
@@ -208,17 +215,22 @@ termo  	: 	ID 	{
 					}
 				}
 			|
-			NUM { SetMaxType(Variable.INTEGER); }
-			|
-			NUM_DEC { SetMaxType(Variable.DECIMAL); }
+			NUM { 
+					System.out.println(LT(0).getText());
+					if(NumberIsDecimal(LT(0).getText()))
+						SetMaxType(Variable.DECIMAL);
+					else
+						SetMaxType(Variable.INTEGER);
+				}
 			|
 			TEXTO { SetMaxType(Variable.STRING);}
 			|
-			BOOLVAL { SetMaxType(Variable.BOOLEAN);}
-;
+			boolVal { SetMaxType(Variable.BOOLEAN);}
+		;
 
 
-
+boolVal:	"true" | "false"
+			;
 
 
 class LeLexer extends Lexer;
@@ -231,16 +243,16 @@ BLANK       :	(' ' | '\n' | '\r' | '\t') {_ttype=Token.SKIP;}
 
 COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.SKIP;}
 			;
-        
+
 ID          :	('a'..'z' |'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
             ;
-        
-NUM         :	('0'..'9')+
-            ;
 
-NUM_DEC		:	('0'..'9')* ('.' ('0'..'9')+)
+NUM			:	('0'..'9')+ ('.' ('0'..'9')+ 'f')?
 			;
         
+TEXTO       :	'"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
+            ;
+
 OPREL       :	'>' | '<' | "=="
             ;
 			
@@ -249,10 +261,6 @@ OPLOG		:	'&' | '|'
 
 OP			:	'+' | '-'
 			;
-			
-TEXTO       :	'"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
-            ;
-
 
 AC			: 	'{'
 			;

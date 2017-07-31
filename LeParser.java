@@ -47,7 +47,10 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	}
 
 	public void ErrorHandling(){
-		for (Error e: _errorList) System.out.println(e.toString());
+		if(_errorList.size() > 0)
+			for (Error e: _errorList) System.out.println(e.toString());
+		else
+			System.out.println("ANALYSIS WITHOUT ERRORS");
 		//TODO: Save in a output file
 	}
 
@@ -74,11 +77,15 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		}
 	}
 
+	private Boolean NumberIsDecimal(String tokenNumber){
+		return tokenNumber.contains("f");
+	}
+
 
 	//Variable Assignment Methods
 	
 	private void CheckVariableAssignment(){
-		if(_varFrom != _varTo.GetType()){
+		if(_varFrom > _varTo.GetType()){
 			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types.");
 		}
 	}
@@ -317,9 +324,9 @@ public LeParser(ParserSharedInputState state) {
 			switch ( LA(1)) {
 			case ID:
 			case NUM:
-			case NUM_DEC:
 			case TEXTO:
-			case BOOLVAL:
+			case LITERAL_true:
+			case LITERAL_false:
 			{
 				cmdExpr();
 				break;
@@ -629,13 +636,13 @@ public LeParser(ParserSharedInputState state) {
 			case NUM:
 			{
 				match(NUM);
-				SetMaxType(Variable.INTEGER);
-				break;
-			}
-			case NUM_DEC:
-			{
-				match(NUM_DEC);
-				SetMaxType(Variable.DECIMAL);
+				
+									System.out.println(LT(0).getText());
+									if(NumberIsDecimal(LT(0).getText()))
+										SetMaxType(Variable.DECIMAL);
+									else
+										SetMaxType(Variable.INTEGER);
+								
 				break;
 			}
 			case TEXTO:
@@ -644,9 +651,10 @@ public LeParser(ParserSharedInputState state) {
 				SetMaxType(Variable.STRING);
 				break;
 			}
-			case BOOLVAL:
+			case LITERAL_true:
+			case LITERAL_false:
 			{
-				match(BOOLVAL);
+				boolVal();
 				SetMaxType(Variable.BOOLEAN);
 				break;
 			}
@@ -686,6 +694,33 @@ public LeParser(ParserSharedInputState state) {
 		}
 	}
 	
+	public final void boolVal() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			switch ( LA(1)) {
+			case LITERAL_true:
+			{
+				match(LITERAL_true);
+				break;
+			}
+			case LITERAL_false:
+			{
+				match(LITERAL_false);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_12);
+		}
+	}
+	
 	
 	public static final String[] _tokenNames = {
 		"<0>",
@@ -722,9 +757,9 @@ public LeParser(ParserSharedInputState state) {
 		"OPREL",
 		"\"str.Concat\"",
 		"OP",
-		"NUM_DEC",
 		"TEXTO",
-		"BOOLVAL",
+		"\"true\"",
+		"\"false\"",
 		"BLANK",
 		"COMMENT",
 		"AC",

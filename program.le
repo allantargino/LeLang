@@ -9,8 +9,12 @@ program myProgram
 
 	# program body
 	a:=3;
-	b:=5;
-	f:=true;
+	b:=4;
+	f:=false;
+
+	myDec:=3.14f;
+	c:=7;
+	myDec:=7.0f;
 
 	name:="allan";
 	name:="emily";

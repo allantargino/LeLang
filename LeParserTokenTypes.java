@@ -33,9 +33,9 @@ public interface LeParserTokenTypes {
 	int OPREL = 31;
 	// "str.Concat" = 32
 	int OP = 33;
-	int NUM_DEC = 34;
-	int TEXTO = 35;
-	int BOOLVAL = 36;
+	int TEXTO = 34;
+	int LITERAL_true = 35;
+	int LITERAL_false = 36;
 	int BLANK = 37;
 	int COMMENT = 38;
 	int AC = 39;

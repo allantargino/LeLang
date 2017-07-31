@@ -1,17 +1,20 @@
-program MyProgram
+program myProgram
 {
 	# variable declaration
 	int a, b;
 	bool f;
 	cte int c:=3, d:=3;
+	decimal myDec;
+	str name;
 
 	# program body
 	a:=3;
 	b:=5;
 	f:=true;
 
-	a:=3+3;
-
+	name:="allan";
+	name:="emily";
+	
 	# Commands
 	Read(a);
 	Write(a);

@@ -1,8 +1,10 @@
-public class Variable{
-    public static final int INTEGER = 1;
-    public static final int DECIMAL = 2;
-    public static final int STRING  = 3;
-    public static final int BOOLEAN = 4;
+public class Variable
+{
+    public static final int BOOLEAN = 1;
+    public static final int INTEGER = 2;
+    public static final int DECIMAL = 3;
+    public static final int STRING  = 4;
+
     
     private String _id;
     private int    _type;

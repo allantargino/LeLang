@@ -7,15 +7,20 @@ options{
 	// Variable Fields
 	private java.util.HashMap<String, Variable> _symbolTable; 
 	private int _varType;
+
+	// Variable Assignment
+	private int _varFrom;
+	private Variable _varTo;
 	
 	// Error Fields
 	private java.util.ArrayList<Error> _errorList;
 
 	public void Init(){
-		//programa = new Programa();
-		//stack    = new StackCommand();
-
 		_symbolTable = new java.util.HashMap<String, Variable>(); 
+		_varType=0;
+
+		_varFrom=0;
+		_varTo=null;
 
 		_errorList = new java.util.ArrayList<Error>();
 	}
@@ -33,21 +38,50 @@ options{
 		//TODO: Save in a output file
 	}
 
+
 	//Variable Handling Methods
 
-	private void CheckVariableCanBeDeclared(String varName){
+	private Boolean CheckVariableCanBeDeclared(String varName){
 		if (_symbolTable.get(varName) == null){
-				Variable v = new Variable(varName, _varType);
-				_symbolTable.put(v.GetId(), v);
+			Variable v = new Variable(varName, _varType);
+			_symbolTable.put(v.GetId(), v);
+			return true;
 		}else{
 			CreateError(1, "Variable " + varName +  " already declared");
+			return false;
 		}
 	}
 	
-	private void CheckVariableCanBeUsed(String varName){
+	private Boolean CheckVariableCanBeUsed(String varName){
 		if (_symbolTable.get(varName) == null){
 			CreateError(2, "Variable " + varName +  " was not declared");
+			return false;
+		}else{
+			return true;
 		}
+	}
+
+
+	//Variable Assignment Methods
+	
+	private void CheckVariableAssignment(){
+		if(_varFrom != _varTo.GetType()){
+			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types.");
+		}
+	}
+
+	private Variable GetVariable(String varName){
+		Variable v = _symbolTable.get(varName);
+		if (v != null){
+			return v;
+		}else{
+			throw new RuntimeException("Variable not declared.");
+		}
+	}
+
+	private void SetMaxType(int varType){
+		if(varType > _varFrom)
+			_varFrom = varType;
 	}
 }
 
@@ -71,17 +105,25 @@ var		:	type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
 		;
 		
 cte		:	"cte" type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
-			ID {CheckVariableCanBeDeclared(LT(0).getText());}
+			ID 	{
+					if(CheckVariableCanBeDeclared(LT(0).getText())){
+						_varTo = GetVariable(LT(0).getText());
+					}
+				}
 			attr
 			(
 				VG
-				ID {CheckVariableCanBeDeclared(LT(0).getText());}
+				ID	{
+						if(CheckVariableCanBeDeclared(LT(0).getText())){
+							_varTo = GetVariable(LT(0).getText());
+						}
+					}
 				attr
 			)*
 			PV
 		;
 
-type	:	("int" | "decimal"| "str"| "bool")
+type	:	("int" | "decimal" | "str"| "bool")
 		;
 		
 block	:	(cmd)*
@@ -90,12 +132,24 @@ block	:	(cmd)*
 cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile | cmdStr
 		;
 
-cmdAttr	:	ID { CheckVariableCanBeUsed(LT(0).getText());}
+cmdAttr	:	ID
+				{
+					if(CheckVariableCanBeUsed(LT(0).getText())){
+						_varTo = GetVariable(LT(0).getText());
+					}
+				}
 			attr
 			PV
 		;
 	   
-attr	:	IG (cmdExpr | TEXTO | boolVal)
+attr	:	IG
+				{ _varFrom = 0;}
+			(
+				cmdExpr
+				|
+
+			)
+			{ CheckVariableAssignment();}
 		;
 		
 cmdRead	:	"Read" "("
@@ -136,8 +190,6 @@ boolCond:	(
 			)
 		;
 
-boolVal	:	("true" | "false")
-		;
 
 cmdStr	:	"str.Concat" "(" TEXT (VG TEXT)+ ")"
 		;
@@ -149,10 +201,21 @@ cmdExpr	: 	termo
 exprl  	:  	(OP termo)*
 		;
        
-termo  	: 	ID { CheckVariableCanBeUsed(LT(0).getText());}
+termo  	: 	ID 	{
+					if(CheckVariableCanBeUsed(LT(0).getText())){
+						Variable v = GetVariable(LT(0).getText());
+						SetMaxType(v.GetType());
+					}
+				}
 			|
-			NUM 
-		;
+			NUM { SetMaxType(Variable.INTEGER); }
+			|
+			NUM_DEC { SetMaxType(Variable.DECIMAL); }
+			|
+			TEXTO { SetMaxType(Variable.STRING);}
+			|
+			BOOLVAL { SetMaxType(Variable.BOOLEAN);}
+;
 
 
 
@@ -163,32 +226,33 @@ options{
    caseSensitive = true;
 }
 
-BLANK       : (' ' | '\n' | '\r' | '\t') {_ttype=Token.SKIP;}
+BLANK       :	(' ' | '\n' | '\r' | '\t') {_ttype=Token.SKIP;}
             ;
 
 COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.SKIP;}
 			;
         
-ID          : ('a'..'z' | 'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
+ID          :	('a'..'z' |'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
             ;
         
-NUM         : ('0'..'9')+
+NUM         :	('0'..'9')+
             ;
 
-NUM_DEC		: ('0'..'9')+ ('.' ('0'..'9')+)? 'd'
+NUM_DEC		:	('0'..'9')* ('.' ('0'..'9')+)
 			;
         
-OPREL       : '>' | '<' | "=="
+OPREL       :	'>' | '<' | "=="
             ;
 			
-OPLOG		: '&' | '|'
+OPLOG		:	'&' | '|'
 			;
 
-OP			: '+' | '-'
+OP			:	'+' | '-'
 			;
 			
-TEXTO       : '"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
+TEXTO       :	'"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
             ;
+
 
 AC			: 	'{'
 			;

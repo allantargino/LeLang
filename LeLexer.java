@@ -40,25 +40,23 @@ public LeLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("nextfor", this), new Integer(29));
-	literals.put(new ANTLRHashString("Write", this), new Integer(20));
-	literals.put(new ANTLRHashString("for", this), new Integer(24));
-	literals.put(new ANTLRHashString("if", this), new Integer(22));
+	literals.put(new ANTLRHashString("nextfor", this), new Integer(28));
+	literals.put(new ANTLRHashString("Write", this), new Integer(19));
+	literals.put(new ANTLRHashString("for", this), new Integer(23));
+	literals.put(new ANTLRHashString("if", this), new Integer(21));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
-	literals.put(new ANTLRHashString("while", this), new Integer(30));
-	literals.put(new ANTLRHashString(")", this), new Integer(19));
-	literals.put(new ANTLRHashString("Read", this), new Integer(17));
-	literals.put(new ANTLRHashString("str.Concat", this), new Integer(35));
-	literals.put(new ANTLRHashString("endif", this), new Integer(23));
+	literals.put(new ANTLRHashString("while", this), new Integer(29));
+	literals.put(new ANTLRHashString(")", this), new Integer(18));
+	literals.put(new ANTLRHashString("Read", this), new Integer(16));
+	literals.put(new ANTLRHashString("str.Concat", this), new Integer(32));
+	literals.put(new ANTLRHashString("endif", this), new Integer(22));
 	literals.put(new ANTLRHashString("{", this), new Integer(6));
 	literals.put(new ANTLRHashString("cte", this), new Integer(10));
-	literals.put(new ANTLRHashString("(", this), new Integer(18));
-	literals.put(new ANTLRHashString("true", this), new Integer(33));
-	literals.put(new ANTLRHashString(":", this), new Integer(27));
+	literals.put(new ANTLRHashString("(", this), new Integer(17));
+	literals.put(new ANTLRHashString(":", this), new Integer(26));
 	literals.put(new ANTLRHashString("bool", this), new Integer(14));
 	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
 	literals.put(new ANTLRHashString("int", this), new Integer(11));
-	literals.put(new ANTLRHashString("false", this), new Integer(34));
 	literals.put(new ANTLRHashString("}", this), new Integer(7));
 	literals.put(new ANTLRHashString("str", this), new Integer(13));
 }
@@ -100,14 +98,6 @@ tryAgain:
 				case 'w':  case 'x':  case 'y':  case 'z':
 				{
 					mID(true);
-					theRetToken=_returnToken;
-					break;
-				}
-				case '0':  case '1':  case '2':  case '3':
-				case '4':  case '5':  case '6':  case '7':
-				case '8':  case '9':
-				{
-					mNUM(true);
 					theRetToken=_returnToken;
 					break;
 				}
@@ -178,7 +168,15 @@ tryAgain:
 					break;
 				}
 				default:
-				{
+					if (((LA(1) >= '0' && LA(1) <= '9'))) {
+						mNUM(true);
+						theRetToken=_returnToken;
+					}
+					else if ((_tokenSet_0.member(LA(1)))) {
+						mNUM_DEC(true);
+						theRetToken=_returnToken;
+					}
+				else {
 					if (LA(1)==EOF_CHAR) {uponEOF(); _returnToken = makeToken(Token.EOF_TYPE);}
 				else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
@@ -252,7 +250,7 @@ tryAgain:
 		
 		match('#');
 		{
-		_loop45:
+		_loop43:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -291,7 +289,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop45;
+				break _loop43;
 			}
 			}
 		} while (true);
@@ -342,7 +340,7 @@ tryAgain:
 		}
 		}
 		{
-		_loop49:
+		_loop47:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -381,7 +379,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop49;
+				break _loop47;
 			}
 			}
 		} while (true);
@@ -399,40 +397,59 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt52=0;
-		_loop52:
+		int _cnt50=0;
+		_loop50:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt52>=1 ) { break _loop52; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt50>=1 ) { break _loop50; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt52++;
+			_cnt50++;
+		} while (true);
+		}
+		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
+			_token = makeToken(_ttype);
+			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
+		}
+		_returnToken = _token;
+	}
+	
+	public final void mNUM_DEC(boolean _createToken) throws RecognitionException, CharStreamException, TokenStreamException {
+		int _ttype; Token _token=null; int _begin=text.length();
+		_ttype = NUM_DEC;
+		int _saveIndex;
+		
+		{
+		_loop53:
+		do {
+			if (((LA(1) >= '0' && LA(1) <= '9'))) {
+				matchRange('0','9');
+			}
+			else {
+				break _loop53;
+			}
+			
 		} while (true);
 		}
 		{
-		if ((LA(1)=='.')) {
-			match('.');
-			{
-			int _cnt55=0;
-			_loop55:
-			do {
-				if (((LA(1) >= '0' && LA(1) <= '9'))) {
-					matchRange('0','9');
-				}
-				else {
-					if ( _cnt55>=1 ) { break _loop55; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
-				}
-				
-				_cnt55++;
-			} while (true);
+		match('.');
+		{
+		int _cnt56=0;
+		_loop56:
+		do {
+			if (((LA(1) >= '0' && LA(1) <= '9'))) {
+				matchRange('0','9');
 			}
+			else {
+				if ( _cnt56>=1 ) { break _loop56; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+			}
+			
+			_cnt56++;
+		} while (true);
 		}
-		else {
-		}
-		
 		}
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
@@ -537,7 +554,7 @@ tryAgain:
 		
 		match('"');
 		{
-		_loop61:
+		_loop62:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -576,7 +593,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop61;
+				break _loop62;
 			}
 			}
 		} while (true);
@@ -681,5 +698,10 @@ tryAgain:
 	}
 	
 	
+	private static final long[] mk_tokenSet_0() {
+		long[] data = { 288019269919178752L, 0L, 0L};
+		return data;
+	}
+	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	
 	}

@@ -7,3 +7,13 @@
 - [ ] Possui operações de Entrada e Saída
 - [x] Aceita números decimais
 - [x] Verificar se a variável já foi previamente declarada
+
+## Adicionais:
+- [x] Constantes
+- [x] Comentários
+- [x] Tipos Booleanos
+- [ ] Concatenação de String ?
+
+### Passos:
+- [ ] Operações Booleanas
+- [ ] Geração de código

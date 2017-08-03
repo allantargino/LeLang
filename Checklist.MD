@@ -13,9 +13,9 @@
 - [x] Tipos Booleanos
 
 ### Passos:
-- [x] Geração de código
+- [ ] Geração de código
 - [ ] Pilha para aninhamento de comandos
-- [ ] Tratamento de erros
 - [ ] Parse para C
 - [ ] Parse para Java
+- [ ] Tratamento de erros
 - [ ] Operações Booleanas

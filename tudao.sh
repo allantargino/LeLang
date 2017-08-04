@@ -6,7 +6,7 @@ if [ $? -eq 0 ]; then
    javac -classpath antlr.jar:. *.java
    echo "ALL CLASSES COMPILED"
    if [ $? -eq 0 ]; then
-       java -cp antlr.jar:. MainClass
+       java -cp antlr.jar:. MainClass > program.c
    else 
        echo "GAVE BAD COMPILING"
    fi

@@ -26,6 +26,8 @@ import antlr.SemanticException;
 
 public class LeLexer extends antlr.CharScanner implements LeParserTokenTypes, TokenStream
  {
+
+	public int _errorLine = 0;
 public LeLexer(InputStream in) {
 	this(new ByteBuffer(in));
 }
@@ -48,17 +50,16 @@ public LeLexer(LexerSharedInputState state) {
 	literals.put(new ANTLRHashString("while", this), new Integer(29));
 	literals.put(new ANTLRHashString(")", this), new Integer(18));
 	literals.put(new ANTLRHashString("Read", this), new Integer(16));
-	literals.put(new ANTLRHashString("str.Concat", this), new Integer(32));
 	literals.put(new ANTLRHashString("endif", this), new Integer(22));
 	literals.put(new ANTLRHashString("{", this), new Integer(6));
 	literals.put(new ANTLRHashString("cte", this), new Integer(10));
 	literals.put(new ANTLRHashString("(", this), new Integer(17));
-	literals.put(new ANTLRHashString("true", this), new Integer(35));
+	literals.put(new ANTLRHashString("true", this), new Integer(33));
 	literals.put(new ANTLRHashString(":", this), new Integer(26));
 	literals.put(new ANTLRHashString("bool", this), new Integer(14));
 	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
 	literals.put(new ANTLRHashString("int", this), new Integer(11));
-	literals.put(new ANTLRHashString("false", this), new Integer(36));
+	literals.put(new ANTLRHashString("false", this), new Integer(34));
 	literals.put(new ANTLRHashString("}", this), new Integer(7));
 	literals.put(new ANTLRHashString("str", this), new Integer(13));
 }
@@ -219,6 +220,9 @@ tryAgain:
 		case '\n':
 		{
 			match('\n');
+			
+										_errorLine++;
+									
 			break;
 		}
 		case '\r':
@@ -252,7 +256,7 @@ tryAgain:
 		
 		match('#');
 		{
-		_loop44:
+		_loop40:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -291,7 +295,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop44;
+				break _loop40;
 			}
 			}
 		} while (true);
@@ -342,7 +346,7 @@ tryAgain:
 		}
 		}
 		{
-		_loop48:
+		_loop44:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -381,7 +385,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop48;
+				break _loop44;
 			}
 			}
 		} while (true);
@@ -399,34 +403,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt51=0;
-		_loop51:
+		int _cnt47=0;
+		_loop47:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt51>=1 ) { break _loop51; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt47>=1 ) { break _loop47; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt51++;
+			_cnt47++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt54=0;
-			_loop54:
+			int _cnt50=0;
+			_loop50:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt54>=1 ) { break _loop54; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt50>=1 ) { break _loop50; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt54++;
+				_cnt50++;
 			} while (true);
 			}
 			match('f');
@@ -449,7 +453,7 @@ tryAgain:
 		
 		match('"');
 		{
-		_loop57:
+		_loop53:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -488,7 +492,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop57;
+				break _loop53;
 			}
 			}
 		} while (true);

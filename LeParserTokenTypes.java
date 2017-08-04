@@ -19,7 +19,7 @@ public interface LeParserTokenTypes {
 	// "(" = 17
 	// ")" = 18
 	int LITERAL_Write = 19;
-	int TEXT = 20;
+	int TEXTO = 20;
 	int LITERAL_if = 21;
 	int LITERAL_endif = 22;
 	int LITERAL_for = 23;
@@ -31,13 +31,11 @@ public interface LeParserTokenTypes {
 	int LITERAL_while = 29;
 	int OPLOG = 30;
 	int OPREL = 31;
-	// "str.Concat" = 32
-	int OP = 33;
-	int TEXTO = 34;
-	int LITERAL_true = 35;
-	int LITERAL_false = 36;
-	int BLANK = 37;
-	int COMMENT = 38;
-	int AC = 39;
-	int FC = 40;
+	int OP = 32;
+	int LITERAL_true = 33;
+	int LITERAL_false = 34;
+	int BLANK = 35;
+	int COMMENT = 36;
+	int AC = 37;
+	int FC = 38;
 }

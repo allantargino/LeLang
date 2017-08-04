@@ -8,14 +8,17 @@ public class Variable
     
     private String _id;
     private int    _type;
+    private Boolean _isConst;
+    private String _expression;
     
-    public Variable(String id, int type){
+    public Variable(String id, int type, Boolean isConst){
         this._id   = id;
         this._type = type;
+        this._isConst = isConst;
     }
 
     public Variable(){
-        this("", -1);
+        this("", -1, false);
     }
     
     public void SetId(String id){
@@ -23,6 +26,10 @@ public class Variable
     }
     public void SetType(int type){
         this._type = type;
+    }
+
+    public void SetExpression(String expression){
+        this._expression = expression;
     }
 
     public static int GetTypeNumber(String type){
@@ -44,6 +51,14 @@ public class Variable
     }
     public int GetType(){
         return this._type;
+    }
+
+    public Boolean IsConst(){
+        return this._isConst;
+    }
+
+    public String GetExpression(){
+        return this._expression;
     }
     
     

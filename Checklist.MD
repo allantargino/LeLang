@@ -2,7 +2,6 @@
 - [x] Possui 2 tipos de variáveis
 - [ ] Possui a estrutura If.. else
 - [ ] Possui estrutura de controle while/do while
-- [x] Operações Aritméticas executadas corretamente
 - [x] Atribuições realizadas corretamente
 - [x] Possui operações de Entrada e Saída
 - [x] Aceita números decimais
@@ -14,5 +13,9 @@
 - [x] Tipos Booleanos
 
 ### Passos:
-- [ ] Operações Booleanas
 - [ ] Geração de código
+- [ ] Pilha para aninhamento de comandos
+- [ ] Parse para C
+- [ ] Parse para Java
+- [ ] Tratamento de erros
+- [ ] Operações Booleanas

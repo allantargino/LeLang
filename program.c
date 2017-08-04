@@ -17,6 +17,7 @@ int main()
 	f = false;
 	myDec = 3.14f;
 	f = true;
+	printf("%d", f);
 	name = "allan";
 	name = "emily";
 	printf("Digite um numero ");

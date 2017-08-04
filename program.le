@@ -17,6 +17,7 @@ program myProgram
 	myDec:=3.14f;
 
 	f:=true;
+	Write(f);
 
 	name:="allan";
 	name:="emily";

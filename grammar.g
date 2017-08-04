@@ -186,14 +186,11 @@ cmdAttr	:	ID
 				{
 					if(CheckVariableCanBeUsed(LT(0).getText())){
 						_varTo = GetVariable(LT(0).getText());
-						cmd = new CommandAssign();
+						cmd = new CommandAssign();					
 					}
 				}
 			attr
 			PV
-			{
-				programStructure.AddCommand(cmd);
-			}
 		;
 	   
 attr	:	IG
@@ -207,6 +204,7 @@ attr	:	IG
 					{
 						((CommandAssign) cmd).SetToVariable(_varTo);
 						((CommandAssign) cmd).SetExpression(_expression);
+						programStructure.AddCommand(cmd);
 					}
 				}
 		;

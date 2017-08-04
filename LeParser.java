@@ -372,6 +372,7 @@ public LeParser(ParserSharedInputState state) {
 								{
 									((CommandAssign) cmd).SetToVariable(_varTo);
 									((CommandAssign) cmd).SetExpression(_expression);
+									programStructure.AddCommand(cmd);
 								}
 							
 		}
@@ -436,14 +437,11 @@ public LeParser(ParserSharedInputState state) {
 			
 								if(CheckVariableCanBeUsed(LT(0).getText())){
 									_varTo = GetVariable(LT(0).getText());
-									cmd = new CommandAssign();
+									cmd = new CommandAssign();					
 								}
 							
 			attr();
 			match(PV);
-			
-							programStructure.AddCommand(cmd);
-						
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);

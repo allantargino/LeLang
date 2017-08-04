@@ -6,29 +6,14 @@ int main()
 	int b;
 	int const c = 3;
 	int const d = 3;
-	bool f;
+	int numero;
 	int x;
-	char* name;
-	char* outro;
 	int y;
 	float myDec;
 	a = 3 + 5 + 90;
 	b = 4;
-	f = false;
 	myDec = 3.14f;
-	f = true;
-	printf("%d", f);
-	name = "allan";
-	name = "emily";
-	printf("Digite um numero ");
-	scanf("%d", &x);
-	printf("Digite outro numero ");
-	scanf("%d", &y);
-	printf("Digite um nome ");
-	scanf("%s", outro);
-	printf("%s", outro);
-	printf("%s", name);
-	printf("%.6f", myDec);
-	printf("fim");
 	return 0;
 }
+1 ERRORS DURING ANALYSIS:
+LE_3: Variable numero cannot received this operation with the current invalid types., in line 0

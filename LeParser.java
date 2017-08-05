@@ -138,6 +138,15 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		}
 	}
 
+	private Boolean CheckVariableIsBoolean(Variable v){
+		if (v.GetType()==Variable.BOOLEAN){
+			return true;
+		}else{
+			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool.");
+			return false;
+		}
+	}
+
 protected LeParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
   tokenNames = _tokenNames;
@@ -407,14 +416,14 @@ public LeParser(ParserSharedInputState state) {
 				cmdIf();
 				break;
 			}
-			case LITERAL_for:
-			{
-				cmdFor();
-				break;
-			}
 			case LITERAL_while:
 			{
 				cmdWhile();
+				break;
+			}
+			case LITERAL_for:
+			{
+				cmdFor();
 				break;
 			}
 			default:
@@ -541,15 +550,13 @@ public LeParser(ParserSharedInputState state) {
 		}
 	}
 	
-	public final void cmdFor() throws RecognitionException, TokenStreamException {
+	public final void cmdWhile() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
-			match(LITERAL_for);
+			match(LITERAL_while);
 			match(AP);
-			match(NUM);
-			match(26);
-			match(NUM);
+			boolExpr();
 			match(FP);
 			match(LITERAL_nextfor);
 		}
@@ -559,13 +566,15 @@ public LeParser(ParserSharedInputState state) {
 		}
 	}
 	
-	public final void cmdWhile() throws RecognitionException, TokenStreamException {
+	public final void cmdFor() throws RecognitionException, TokenStreamException {
 		
 		
 		try {      // for error handling
-			match(LITERAL_while);
+			match(LITERAL_for);
 			match(AP);
-			boolExpr();
+			match(NUM);
+			match(26);
+			match(NUM);
 			match(FP);
 			match(LITERAL_nextfor);
 		}
@@ -628,7 +637,17 @@ public LeParser(ParserSharedInputState state) {
 			}
 			else if ((LA(1)==ID) && (LA(2)==18||LA(2)==FP||LA(2)==OPLOG)) {
 				match(ID);
-				CheckVariableCanBeUsed(LT(0).getText());
+				
+										if(CheckVariableCanBeUsed(LT(0).getText())){
+											Variable v = GetVariable(LT(0).getText());
+											if(CheckVariableIsBoolean(v)){
+												
+											}
+										}
+									
+			}
+			else if ((LA(1)==LITERAL_true||LA(1)==LITERAL_false) && (LA(2)==18||LA(2)==FP||LA(2)==OPLOG)) {
+				boolVal();
 			}
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
@@ -639,6 +658,33 @@ public LeParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_11);
+		}
+	}
+	
+	public final void boolVal() throws RecognitionException, TokenStreamException {
+		
+		
+		try {      // for error handling
+			switch ( LA(1)) {
+			case LITERAL_true:
+			{
+				match(LITERAL_true);
+				break;
+			}
+			case LITERAL_false:
+			{
+				match(LITERAL_false);
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+		}
+		catch (RecognitionException ex) {
+			reportError(ex);
+			recover(ex,_tokenSet_12);
 		}
 	}
 	
@@ -721,33 +767,6 @@ public LeParser(ParserSharedInputState state) {
 		catch (RecognitionException ex) {
 			reportError(ex);
 			recover(ex,_tokenSet_8);
-		}
-	}
-	
-	public final void boolVal() throws RecognitionException, TokenStreamException {
-		
-		
-		try {      // for error handling
-			switch ( LA(1)) {
-			case LITERAL_true:
-			{
-				match(LITERAL_true);
-				break;
-			}
-			case LITERAL_false:
-			{
-				match(LITERAL_false);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_12);
 		}
 	}
 	

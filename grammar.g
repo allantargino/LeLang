@@ -124,6 +124,15 @@ options{
 			return false;
 		}
 	}
+
+	private Boolean CheckVariableIsBoolean(Variable v){
+		if (v.GetType()==Variable.BOOLEAN){
+			return true;
+		}else{
+			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool.");
+			return false;
+		}
+	}
 }
 
 
@@ -179,7 +188,7 @@ type	:	("int" | "decimal" | "str"| "bool")
 block	:	(cmd)*
 		;
 
-cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdFor | cmdWhile
+cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdWhile | cmdFor
 		;
 
 cmdAttr	:	ID
@@ -265,7 +274,16 @@ boolExpr:	boolCond (OPLOG boolCond)*
 boolCond:	(
 				cmdExpr OPREL cmdExpr
 				|
-				ID { CheckVariableCanBeUsed(LT(0).getText());}
+				ID	{
+						if(CheckVariableCanBeUsed(LT(0).getText())){
+							Variable v = GetVariable(LT(0).getText());
+							if(CheckVariableIsBoolean(v)){
+								
+							}
+						}
+					}
+				|
+				boolVal
 			)
 		;
 

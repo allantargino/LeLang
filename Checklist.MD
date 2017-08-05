@@ -18,4 +18,5 @@
 - [ ] Parse para C
 - [ ] Parse para Java
 - [ ] Tratamento de erros
+- [ ] Avisos
 - [ ] Operações Booleanas

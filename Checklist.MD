@@ -15,13 +15,12 @@
 ### Passos:
 - [x] Pilha para aninhamento de comandos
 - [x] Parse para C
-- [ ] Identação de linhas
+- [ ] C Beautifier
+- [ ] For
 - [ ] Tratamento de erros
     - [ ] Erros do Antlr
     - [ ] Erros do Le
     - [ ] Avisos
 - [ ] Otimizações de código
-- [ ] Organização de código
-
-- [ ] Operações Booleanas?
-- [ ] Parse para Java?
+- [ ] Organização de código (pacotes e classes, herança e reaproveimento de código)
+- [ ] IDE

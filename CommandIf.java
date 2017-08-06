@@ -33,18 +33,18 @@ public class CommandIf extends CommandReceiver {
 
         if (!_trueCommandList.isEmpty()) {
             for (Command c : _trueCommandList) {
-                str.append("\t\t").append(c.WriteCode());
+                str.append(c.WriteCode());
             }
         }
 
         if (!_falseCommandList.isEmpty()) {
-            str.append("\t}else{\n");
+            str.append("}else{\n");
             for (Command c : _falseCommandList) {
-                str.append("\t\t").append(c.WriteCode());
+                str.append(c.WriteCode());
             }
         }
 
-        str.append("\t}\n");
+        str.append("}\n");
         return str.toString();
     }
 }

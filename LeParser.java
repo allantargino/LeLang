@@ -49,8 +49,8 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 
 		_errorList = new ArrayList<Error>();
 
-		_programStructure = new ProgramStructure();
 		_cmdStack = new Stack<Command>();
+		_programStructure = new ProgramStructure();
 	}
 
 
@@ -161,6 +161,14 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 			((CommandReceiver)_cmdStack.peek()).AddCommand(_cmd);
 	}
 
+	private int GetIdentationLevel(){
+		return _cmdStack.size();
+	}
+
+	public String GetCode(){
+		return _programStructure.WriteCode();
+	}
+
 protected LeParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
   tokenNames = _tokenNames;
@@ -200,9 +208,6 @@ public LeParser(ParserSharedInputState state) {
 							
 			block();
 			match(7);
-			
-							System.out.println(_programStructure.WriteCode());
-						
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);

@@ -38,8 +38,8 @@ options{
 
 		_errorList = new ArrayList<Error>();
 
-		_programStructure = new ProgramStructure();
 		_cmdStack = new Stack<Command>();
+		_programStructure = new ProgramStructure();
 	}
 
 
@@ -149,6 +149,14 @@ options{
 		else
 			((CommandReceiver)_cmdStack.peek()).AddCommand(_cmd);
 	}
+
+	private int GetIdentationLevel(){
+		return _cmdStack.size();
+	}
+
+	public String GetCode(){
+		return _programStructure.WriteCode();
+	}
 }
 
 
@@ -162,9 +170,6 @@ program : 	"program" ID "{"
 				}
 				block
 			"}"
-			{
-				System.out.println(_programStructure.WriteCode());
-			}
 		;
 
 declare	:	(var | cte) *

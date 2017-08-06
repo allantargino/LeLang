@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class ProgramStructure {
+public class ProgramStructure extends CommandReceiver {
     ArrayList<Variable> varList;
     ArrayList<Command> comandos;
 
@@ -18,22 +18,23 @@ public class ProgramStructure {
     }
 
     public String WriteCode() {
-        StringBuilder str = new StringBuilder();
-        str.append("#include <stdio.h>\n");
-        str.append("#include <stdbool.h>\n");
-        str.append("int main()\n");
-        str.append("{\n");
+        AppendLine("#include <stdio.h>");
+        AppendLine("#include <stdbool.h>");
+        
+        AppendLine("int main()");
+        AppendLine("{");
         //Variables
         for (Variable v : varList) {
-            str.append("\t" + WriteVariable(v));
+            AppendLine(WriteVariable(v));
         }
         //Commands
         for (Command cmd : comandos) {
-            str.append("\t" + cmd.WriteCode());
+            AppendLine(cmd.WriteCode());
         }
-        str.append("\treturn 0;\n");
-        str.append("}");
-        return str.toString();
+        AppendLine("return 0;");
+        AppendLine("}");
+
+        return GetCommandCode();
     }
 
     private String WriteVariable(Variable v) {
@@ -60,7 +61,7 @@ public class ProgramStructure {
             line+= v.GetId();
         }
 
-        line += ";\n";
+        line += ";";
         return line;
     }
 }

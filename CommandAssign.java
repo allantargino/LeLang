@@ -1,7 +1,6 @@
 public class CommandAssign extends Command {
 
     private Variable _toVar;
-
     private String _expression;
 
     public void SetToVariable(Variable variable) {
@@ -13,6 +12,7 @@ public class CommandAssign extends Command {
     }
 
     public String WriteCode() {
-        return _toVar.GetId() + " =" + _expression + ";\n";
+        AppendLine(_toVar.GetId() + "=" + _expression + ";");
+        return GetCommandCode();
     }
 }

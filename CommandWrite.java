@@ -6,7 +6,7 @@ public class CommandWrite extends Command {
     private int _type;
     private Variable _variable;
 
-    public CommandWrite(){
+    public CommandWrite() {
         _type = TYPE_TEXT;
     }
 
@@ -24,7 +24,8 @@ public class CommandWrite extends Command {
 
     public String WriteCode() {
         if (_type == TYPE_TEXT) {
-            return "printf(" + _content + ");\n";
+            AppendLine("printf(" + _content + ");");
+            return GetCommandCode();
         } else if (_type == TYPE_ID) {
             if (_variable != null) {
                 String format = "";
@@ -44,7 +45,8 @@ public class CommandWrite extends Command {
                 default:
                     break;
                 }
-                return "printf(\"" + format + "\", " + _variable.GetId() + ");\n";
+                AppendLine("printf(\"" + format + "\", " + _variable.GetId() + ");");
+                return GetCommandCode();
             } else {
                 throw new RuntimeException("Variable value must be set");
             }

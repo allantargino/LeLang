@@ -11,7 +11,7 @@ if ($?) {
     Write-Output "2. ALL JAVA CLASSES COMPILED."
 
     if ($?) {
-        java -cp ".;./antlr/antlr.jar;" MainClass $input $output
+        java -cp ".;./antlr/antlr.jar;" LeCompiler $input $output
         Write-Output "3. LE COMPILER EXECUTED."
     }
     else {

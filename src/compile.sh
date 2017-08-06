@@ -10,7 +10,7 @@ if [ $? -eq 0 ]; then
    javac -classpath ./antlr/antlr.jar:. *.java
    echo "2. ALL JAVA CLASSES COMPILED."
    if [ $? -eq 0 ]; then
-        java -cp ./antlr/antlr.jar:. MainClass $input $output
+        java -cp ./antlr/antlr.jar:. LeCompiler $input $output
         echo "3. LE COMPILER EXECUTED."
    else 
        echo "==> ERROR: JAVA CLASSES."

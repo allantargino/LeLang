@@ -11,16 +11,18 @@
 - [x] Constantes
 - [x] Comentários
 - [x] Tipos Booleanos
-
-### Passos:
-- [x] Pilha para aninhamento de comandos
-- [x] Parse para C
-- [ ] C Beautifier
-- [ ] For
+- [ ] **For**
+- [ ] IDE
 - [ ] Tratamento de erros
     - [ ] Erros do Antlr
     - [ ] Erros do Le
     - [ ] Avisos
+    
+### Passos:
+- [x] Pilha para aninhamento de comandos
+- [x] Parse para C
+- [ ] **ProgramStructure -> CommandProgram**
+- [ ] C Beautifier
+
 - [ ] Otimizações de código
-- [ ] Organização de código (pacotes e classes, herança e reaproveimento de código)
-- [ ] IDE
+- [ ] Organização de código (herança e reaproveimento de código)

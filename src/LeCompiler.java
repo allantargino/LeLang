@@ -1,7 +1,7 @@
 import java.io.*;
 import lelang.util.*;
 
-public class MainClass {
+public class LeCompiler {
     public static void main(String args[]) {
         try {
             String input = args[0];

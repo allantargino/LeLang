@@ -1,10 +1,13 @@
 import java.io.*;
 import lelang.util.*;
 
-public class LeCompiler {
+public class MainClass {
     public static void main(String args[]) {
         try {
-            LeLexer lexer = new LeLexer(new FileInputStream(new File("program.le")));
+            String input = args[0];
+            String output = args[1];
+
+            LeLexer lexer = new LeLexer(new FileInputStream(new File(input)));
             LeParser parser = new LeParser(lexer);
             parser.Init();
             parser.program();
@@ -14,16 +17,16 @@ public class LeCompiler {
             Beautifier beautifier = new Beautifier(code);
             String beautyCode = beautifier.BeautifyCCode();
 
-            WriteFileCode(beautyCode);
+            WriteFileCode(beautyCode, output);
         } catch (IOException e) {
-			e.printStackTrace();
+            e.printStackTrace();
         } catch (Exception ex) {
             ex.printStackTrace();
-		}
+        }
     }
 
-    private static void WriteFileCode(String text) throws Exception {
-        File file = new File("program.c");
+    private static void WriteFileCode(String text, String output) throws Exception {
+        File file = new File(output);
         FileOutputStream stream = new FileOutputStream(file);
 
         if (!file.exists())

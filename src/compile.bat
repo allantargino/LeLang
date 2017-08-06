@@ -1,1 +1,0 @@
-java -cp antlr.jar antlr.Tool grammar.g

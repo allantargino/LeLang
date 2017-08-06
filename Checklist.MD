@@ -1,7 +1,7 @@
 ## Features Checklist:
 - [x] Possui 2 tipos de variáveis
-- [ ] Possui a estrutura If.. else
-- [ ] Possui estrutura de controle while/do while
+- [x] Possui a estrutura If.. else
+- [x] Possui estrutura de controle while/do while
 - [x] Atribuições realizadas corretamente
 - [x] Possui operações de Entrada e Saída
 - [x] Aceita números decimais
@@ -13,10 +13,15 @@
 - [x] Tipos Booleanos
 
 ### Passos:
-- [ ] Geração de código
-- [ ] Pilha para aninhamento de comandos
-- [ ] Parse para C
-- [ ] Parse para Java
+- [x] Pilha para aninhamento de comandos
+- [x] Parse para C
+- [ ] Identação de linhas
 - [ ] Tratamento de erros
-- [ ] Avisos
-- [ ] Operações Booleanas
+    - [ ] Erros do Antlr
+    - [ ] Erros do Le
+    - [ ] Avisos
+- [ ] Otimizações de código
+- [ ] Organização de código
+
+- [ ] Operações Booleanas?
+- [ ] Parse para Java?

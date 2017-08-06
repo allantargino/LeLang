@@ -14,38 +14,43 @@ import antlr.SemanticException;
 import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
 
+	import java.util.*;
+
 public class LeParser extends antlr.LLkParser       implements LeParserTokenTypes
  {
 
 	// Variable Fields
-	private java.util.HashMap<String, Variable> _symbolTable; 
+	private HashMap<String, Variable> _symbolTable; 
 	private int _varType;
 	private Boolean _endOfAssignment;
 
 	// Variable Assignment
 	private int _varFrom;
 	private Variable _varTo;
-	private String _expression;
+	private String _mathExpression;
+	private String _logicalExpression;
 	
 	// Error Fields
-	private java.util.ArrayList<Error> _errorList;
+	private ArrayList<Error> _errorList;
 
 
 	// Code Writing
-	private Command cmd;
-	private ProgramStructure programStructure;
+	private Command _cmd;
+	private ProgramStructure _programStructure;
+	private Stack<Command> _cmdStack;
 
 	public void Init(){
-		_symbolTable = new java.util.HashMap<String, Variable>(); 
+		_symbolTable = new HashMap<String, Variable>(); 
 		_varType=0;
 		_endOfAssignment=false;
 
 		_varFrom=0;
 		_varTo=null;
 
-		_errorList = new java.util.ArrayList<Error>();
+		_errorList = new ArrayList<Error>();
 
-		programStructure = new ProgramStructure();
+		_programStructure = new ProgramStructure();
+		_cmdStack = new Stack<Command>();
 	}
 
 
@@ -147,6 +152,15 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		}
 	}
 
+	//Code Writing
+
+	private void AddGlobalCommand(){
+		if(_cmdStack.empty())
+			_programStructure.AddCommand(_cmd);
+		else
+			((CommandReceiver)_cmdStack.peek()).AddCommand(_cmd);
+	}
+
 protected LeParser(TokenBuffer tokenBuf, int k) {
   super(tokenBuf,k);
   tokenNames = _tokenNames;
@@ -181,13 +195,13 @@ public LeParser(ParserSharedInputState state) {
 			
 								_endOfAssignment = true;
 								for (Variable v : _symbolTable.values()) {
-									programStructure.AddVariable(v);
+									_programStructure.AddVariable(v);
 								}
 							
 			block();
 			match(7);
 			
-							System.out.println(programStructure.WriteCode());
+							System.out.println(_programStructure.WriteCode());
 						
 		}
 		catch (RecognitionException ex) {
@@ -298,7 +312,7 @@ public LeParser(ParserSharedInputState state) {
 								}
 							
 			attr();
-			_varTo.SetExpression(_expression);
+			_varTo.SetExpression(_mathExpression);
 			{
 			_loop10:
 			do {
@@ -311,7 +325,7 @@ public LeParser(ParserSharedInputState state) {
 											}
 										
 					attr();
-					_varTo.SetExpression(_expression);
+					_varTo.SetExpression(_mathExpression);
 				}
 				else {
 					break _loop10;
@@ -373,15 +387,14 @@ public LeParser(ParserSharedInputState state) {
 			match(IG);
 			
 								_varFrom = 0;
-								_expression = "";
 							
 			cmdExpr();
 			
 								if(CheckVariableAssignment() && !CheckVariableIsConst())
 								{
-									((CommandAssign) cmd).SetToVariable(_varTo);
-									((CommandAssign) cmd).SetExpression(_expression);
-									programStructure.AddCommand(cmd);
+									((CommandAssign) _cmd).SetToVariable(_varTo);
+									((CommandAssign) _cmd).SetExpression(_mathExpression);
+									AddGlobalCommand();
 								}
 							
 		}
@@ -446,7 +459,7 @@ public LeParser(ParserSharedInputState state) {
 			
 								if(CheckVariableCanBeUsed(LT(0).getText())){
 									_varTo = GetVariable(LT(0).getText());
-									cmd = new CommandAssign();					
+									_cmd = new CommandAssign();					
 								}
 							
 			attr();
@@ -464,21 +477,21 @@ public LeParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_Read);
 			match(17);
-			cmd = new CommandRead();
+			_cmd = new CommandRead();
 			match(ID);
 			
 								String varName = LT(0).getText();
 								if(CheckVariableCanBeUsed(varName)){
 									Variable v = _symbolTable.get(varName);
 									if(!CheckVariableIsConst(v)){
-										((CommandRead) cmd).SetVariable(v);
+										((CommandRead) _cmd).SetVariable(v);
 									}
 								}
 							
 			match(18);
 			match(PV);
 			
-							programStructure.AddCommand(cmd);
+							AddGlobalCommand();
 						
 		}
 		catch (RecognitionException ex) {
@@ -493,13 +506,13 @@ public LeParser(ParserSharedInputState state) {
 		try {      // for error handling
 			match(LITERAL_Write);
 			match(17);
-			cmd = new CommandWrite();
+			_cmd = new CommandWrite();
 			{
 			switch ( LA(1)) {
 			case TEXTO:
 			{
 				match(TEXTO);
-				((CommandWrite) cmd).SetContent(LT(0).getText());
+				((CommandWrite) _cmd).SetContent(LT(0).getText());
 				break;
 			}
 			case ID:
@@ -509,8 +522,8 @@ public LeParser(ParserSharedInputState state) {
 										String varName = LT(0).getText();
 										if(CheckVariableCanBeUsed(varName)){
 											Variable v = _symbolTable.get(varName);
-											((CommandWrite) cmd).SetType(CommandWrite.TYPE_ID);
-											((CommandWrite) cmd).SetVariable(v);
+											((CommandWrite) _cmd).SetType(CommandWrite.TYPE_ID);
+											((CommandWrite) _cmd).SetVariable(v);
 										}
 									
 				break;
@@ -524,7 +537,7 @@ public LeParser(ParserSharedInputState state) {
 			match(18);
 			match(PV);
 			
-							programStructure.AddCommand(cmd);
+							AddGlobalCommand();
 						
 		}
 		catch (RecognitionException ex) {
@@ -538,11 +551,37 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_if);
+			
+								_cmd = new CommandIf();
+								AddGlobalCommand();
+								_cmdStack.push(_cmd);
+							
 			match(17);
 			boolExpr();
+			((CommandIf)_cmd).SetLogicalExpression(_logicalExpression);
 			match(18);
 			block();
+			{
+			switch ( LA(1)) {
+			case LITERAL_else:
+			{
+				match(LITERAL_else);
+				((CommandIf) _cmdStack.peek()).SetElseFlag(true);
+				block();
+				break;
+			}
+			case LITERAL_endif:
+			{
+				break;
+			}
+			default:
+			{
+				throw new NoViableAltException(LT(1), getFilename());
+			}
+			}
+			}
 			match(LITERAL_endif);
+			_cmdStack.pop();
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -555,10 +594,18 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			match(LITERAL_while);
-			match(AP);
+			
+								_cmd = new CommandWhile();
+								AddGlobalCommand();
+								_cmdStack.push(_cmd);
+							
+			match(17);
 			boolExpr();
-			match(FP);
-			match(LITERAL_nextfor);
+			((CommandWhile)_cmd).SetLogicalExpression(_logicalExpression);
+			match(18);
+			block();
+			match(LITERAL_next);
+			_cmdStack.pop();
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -573,10 +620,10 @@ public LeParser(ParserSharedInputState state) {
 			match(LITERAL_for);
 			match(AP);
 			match(NUM);
-			match(26);
+			match(29);
 			match(NUM);
 			match(FP);
-			match(LITERAL_nextfor);
+			match(LITERAL_next);
 		}
 		catch (RecognitionException ex) {
 			reportError(ex);
@@ -588,9 +635,10 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
+			_mathExpression = "";
 			termo();
 			
-								_expression += " " + LT(0).getText();
+								_mathExpression += " " + LT(0).getText();
 							
 			exprl();
 		}
@@ -604,16 +652,18 @@ public LeParser(ParserSharedInputState state) {
 		
 		
 		try {      // for error handling
+			_logicalExpression = "";
 			boolCond();
 			{
-			_loop27:
+			_loop28:
 			do {
 				if ((LA(1)==OPLOG)) {
 					match(OPLOG);
+					_logicalExpression += " " + LT(0).getText();
 					boolCond();
 				}
 				else {
-					break _loop27;
+					break _loop28;
 				}
 				
 			} while (true);
@@ -632,22 +682,26 @@ public LeParser(ParserSharedInputState state) {
 			{
 			if ((_tokenSet_10.member(LA(1))) && (LA(2)==OPREL||LA(2)==OP)) {
 				cmdExpr();
+				_logicalExpression+=_mathExpression;
 				match(OPREL);
+				_logicalExpression+= " " + LT(0).getText();
 				cmdExpr();
+				_logicalExpression+=_mathExpression + " ";
 			}
-			else if ((LA(1)==ID) && (LA(2)==18||LA(2)==FP||LA(2)==OPLOG)) {
+			else if ((LA(1)==ID) && (LA(2)==18||LA(2)==OPLOG)) {
 				match(ID);
 				
 										if(CheckVariableCanBeUsed(LT(0).getText())){
 											Variable v = GetVariable(LT(0).getText());
 											if(CheckVariableIsBoolean(v)){
-												
+												_logicalExpression+=v.GetId();
 											}
 										}
 									
 			}
-			else if ((LA(1)==LITERAL_true||LA(1)==LITERAL_false) && (LA(2)==18||LA(2)==FP||LA(2)==OPLOG)) {
+			else if ((LA(1)==LITERAL_true||LA(1)==LITERAL_false) && (LA(2)==18||LA(2)==OPLOG)) {
 				boolVal();
+				_logicalExpression+=LT(0).getText();
 			}
 			else {
 				throw new NoViableAltException(LT(1), getFilename());
@@ -745,20 +799,20 @@ public LeParser(ParserSharedInputState state) {
 		
 		try {      // for error handling
 			{
-			_loop33:
+			_loop34:
 			do {
 				if ((LA(1)==OP)) {
 					match(OP);
 					
-										_expression += " " + LT(0).getText();
+										_mathExpression += " " + LT(0).getText();
 									
 					termo();
 					
-										_expression += " " + LT(0).getText();
+										_mathExpression += " " + LT(0).getText();
 									
 				}
 				else {
-					break _loop33;
+					break _loop34;
 				}
 				
 			} while (true);
@@ -794,14 +848,15 @@ public LeParser(ParserSharedInputState state) {
 		"\"Write\"",
 		"TEXTO",
 		"\"if\"",
+		"\"else\"",
 		"\"endif\"",
+		"\"while\"",
+		"\"next\"",
 		"\"for\"",
 		"AP",
 		"NUM",
 		"\":\"",
 		"FP",
-		"\"nextfor\"",
-		"\"while\"",
 		"OPLOG",
 		"OPREL",
 		"OP",
@@ -819,22 +874,22 @@ public LeParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 547946656L, 0L};
+		long[] data = { 86573216L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	private static final long[] mk_tokenSet_2() {
-		long[] data = { 547946528L, 0L};
+		long[] data = { 86573088L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
 	private static final long[] mk_tokenSet_3() {
-		long[] data = { 4194432L, 0L};
+		long[] data = { 46137472L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
 	private static final long[] mk_tokenSet_4() {
-		long[] data = { 547978400L, 0L};
+		long[] data = { 86604960L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
@@ -849,32 +904,32 @@ public LeParser(ParserSharedInputState state) {
 	}
 	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
 	private static final long[] mk_tokenSet_7() {
-		long[] data = { 552140960L, 0L};
+		long[] data = { 132710560L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
 	private static final long[] mk_tokenSet_8() {
-		long[] data = { 3355706112L, 0L};
+		long[] data = { 6442713856L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
 	private static final long[] mk_tokenSet_9() {
-		long[] data = { 134479872L, 0L};
+		long[] data = { 262144L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
 	private static final long[] mk_tokenSet_10() {
-		long[] data = { 25804406816L, 0L};
+		long[] data = { 51809091616L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
 	private static final long[] mk_tokenSet_11() {
-		long[] data = { 1208221696L, 0L};
+		long[] data = { 2147745792L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
 	private static final long[] mk_tokenSet_12() {
-		long[] data = { 7650673408L, 0L};
+		long[] data = { 15032648448L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_12 = new BitSet(mk_tokenSet_12());

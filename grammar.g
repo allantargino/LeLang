@@ -1,3 +1,7 @@
+{
+	import java.util.*;
+}
+
 class LeParser extends Parser;
 options{
     k = 2;
@@ -5,34 +9,37 @@ options{
 
 {
 	// Variable Fields
-	private java.util.HashMap<String, Variable> _symbolTable; 
+	private HashMap<String, Variable> _symbolTable; 
 	private int _varType;
 	private Boolean _endOfAssignment;
 
 	// Variable Assignment
 	private int _varFrom;
 	private Variable _varTo;
-	private String _expression;
+	private String _mathExpression;
+	private String _logicalExpression;
 	
 	// Error Fields
-	private java.util.ArrayList<Error> _errorList;
+	private ArrayList<Error> _errorList;
 
 
 	// Code Writing
-	private Command cmd;
-	private ProgramStructure programStructure;
+	private Command _cmd;
+	private ProgramStructure _programStructure;
+	private Stack<Command> _cmdStack;
 
 	public void Init(){
-		_symbolTable = new java.util.HashMap<String, Variable>(); 
+		_symbolTable = new HashMap<String, Variable>(); 
 		_varType=0;
 		_endOfAssignment=false;
 
 		_varFrom=0;
 		_varTo=null;
 
-		_errorList = new java.util.ArrayList<Error>();
+		_errorList = new ArrayList<Error>();
 
-		programStructure = new ProgramStructure();
+		_programStructure = new ProgramStructure();
+		_cmdStack = new Stack<Command>();
 	}
 
 
@@ -133,6 +140,15 @@ options{
 			return false;
 		}
 	}
+
+	//Code Writing
+
+	private void AddGlobalCommand(){
+		if(_cmdStack.empty())
+			_programStructure.AddCommand(_cmd);
+		else
+			((CommandReceiver)_cmdStack.peek()).AddCommand(_cmd);
+	}
 }
 
 
@@ -141,13 +157,13 @@ program : 	"program" ID "{"
 				{
 					_endOfAssignment = true;
 					for (Variable v : _symbolTable.values()) {
-						programStructure.AddVariable(v);
+						_programStructure.AddVariable(v);
 					}
 				}
 				block
 			"}"
 			{
-				System.out.println(programStructure.WriteCode());
+				System.out.println(_programStructure.WriteCode());
 			}
 		;
 
@@ -169,7 +185,7 @@ cte		:	"cte" type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
 						_varTo = GetVariable(LT(0).getText());
 					}
 				}
-			attr { _varTo.SetExpression(_expression); }
+			attr { _varTo.SetExpression(_mathExpression); }
 			(
 				VG
 				ID	{
@@ -177,7 +193,7 @@ cte		:	"cte" type { _varType = Variable.GetTypeNumber(LT(0).getText()); }
 							_varTo = GetVariable(LT(0).getText());
 						}
 					}
-				attr  { _varTo.SetExpression(_expression); }
+				attr  { _varTo.SetExpression(_mathExpression); }
 			)*
 			PV
 		;
@@ -195,7 +211,7 @@ cmdAttr	:	ID
 				{
 					if(CheckVariableCanBeUsed(LT(0).getText())){
 						_varTo = GetVariable(LT(0).getText());
-						cmd = new CommandAssign();					
+						_cmd = new CommandAssign();					
 					}
 				}
 			attr
@@ -205,91 +221,120 @@ cmdAttr	:	ID
 attr	:	IG
 				{
 					_varFrom = 0;
-					_expression = "";
 				}
 			cmdExpr
 				{
 					if(CheckVariableAssignment() && !CheckVariableIsConst())
 					{
-						((CommandAssign) cmd).SetToVariable(_varTo);
-						((CommandAssign) cmd).SetExpression(_expression);
-						programStructure.AddCommand(cmd);
+						((CommandAssign) _cmd).SetToVariable(_varTo);
+						((CommandAssign) _cmd).SetExpression(_mathExpression);
+						AddGlobalCommand();
 					}
 				}
 		;
 		
-cmdRead	:	"Read" "(" { cmd = new CommandRead(); }
+cmdRead	:	"Read" "(" { _cmd = new CommandRead(); }
 				ID
 				{
 					String varName = LT(0).getText();
 					if(CheckVariableCanBeUsed(varName)){
 						Variable v = _symbolTable.get(varName);
 						if(!CheckVariableIsConst(v)){
-							((CommandRead) cmd).SetVariable(v);
+							((CommandRead) _cmd).SetVariable(v);
 						}
 					}
 				}
 			")"
 			PV
 			{
-				programStructure.AddCommand(cmd);
+				AddGlobalCommand();
 			}
 		;
 
-cmdWrite:	"Write" "(" { cmd = new CommandWrite(); }
+cmdWrite:	"Write" "(" { _cmd = new CommandWrite(); }
 			(
-				TEXTO {((CommandWrite) cmd).SetContent(LT(0).getText());}
+				TEXTO {((CommandWrite) _cmd).SetContent(LT(0).getText());}
 				|
 				ID {
 						String varName = LT(0).getText();
 						if(CheckVariableCanBeUsed(varName)){
 							Variable v = _symbolTable.get(varName);
-							((CommandWrite) cmd).SetType(CommandWrite.TYPE_ID);
-							((CommandWrite) cmd).SetVariable(v);
+							((CommandWrite) _cmd).SetType(CommandWrite.TYPE_ID);
+							((CommandWrite) _cmd).SetVariable(v);
 						}
 					}
 			) ")"
 			PV
 			{
-				programStructure.AddCommand(cmd);
+				AddGlobalCommand();
 			}
 		;
 		
-cmdIf	:	"if" "(" boolExpr ")"
+cmdIf	:	"if" 	
+				{
+					_cmd = new CommandIf();
+					AddGlobalCommand();
+					_cmdStack.push(_cmd);
+				}
+				"("
+					boolExpr { ((CommandIf)_cmd).SetLogicalExpression(_logicalExpression); }
+				")"
 				block
-			"endif"
+			(
+			"else" { ((CommandIf) _cmdStack.peek()).SetElseFlag(true);}
+				block
+			)?
+			
+			"endif" { _cmdStack.pop(); }
 		;
+		
+cmdWhile:	"while"
+				{
+					_cmd = new CommandWhile();
+					AddGlobalCommand();
+					_cmdStack.push(_cmd);
+				}
+				"("
+					boolExpr  { ((CommandWhile)_cmd).SetLogicalExpression(_logicalExpression); }
+				")"
+				block
+			"next" { _cmdStack.pop(); }
+		;
+		
 		
 cmdFor	:	"for" AP NUM ":" NUM FP
-			"nextfor"
+			"next"
 		;
-		
-cmdWhile:	"while" AP boolExpr FP
-			"nextfor"
-		;
-		
-boolExpr:	boolCond (OPLOG boolCond)*
+
+boolExpr:	{ _logicalExpression = "";}
+			boolCond (
+				OPLOG { _logicalExpression += " " + LT(0).getText();}
+				boolCond
+				)*
 		;
 		
 boolCond:	(
-				cmdExpr OPREL cmdExpr
+				cmdExpr { _logicalExpression+=_mathExpression; }
+				OPREL	{ _logicalExpression+= " " + LT(0).getText(); }
+				cmdExpr { _logicalExpression+=_mathExpression + " "; }
 				|
 				ID	{
 						if(CheckVariableCanBeUsed(LT(0).getText())){
 							Variable v = GetVariable(LT(0).getText());
 							if(CheckVariableIsBoolean(v)){
-								
+								_logicalExpression+=v.GetId();
 							}
 						}
 					}
 				|
-				boolVal
+				boolVal { _logicalExpression+=LT(0).getText(); }
 			)
 		;
 
-cmdExpr	: 	termo
+cmdExpr	: 	{ _mathExpression = "";}
+			termo
 				{
-					_expression += " " + LT(0).getText();
+					_mathExpression += " " + LT(0).getText();
 				}
 			exprl
 		;
@@ -297,11 +342,11 @@ cmdExpr	: 	termo
 exprl  	:  	(
 				OP
 				{
-					_expression += " " + LT(0).getText();
+					_mathExpression += " " + LT(0).getText();
 				}
 				termo
 				{
-					_expression += " " + LT(0).getText();
+					_mathExpression += " " + LT(0).getText();
 				}
 			)*
 		;
@@ -328,11 +373,11 @@ termo  	: 	ID 	{
 
 boolVal:	"true" | "false"
 			;
-
-
+		
 class LeLexer extends Lexer;
 options{
 	caseSensitive = true;
+	k=2;
 }
 {
 	public int _errorLine = 0;
@@ -361,10 +406,10 @@ NUM			:	('0'..'9')+ ('.' ('0'..'9')+ 'f')?
 TEXTO       :	'"' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '"'
             ;
 
-OPREL       :	'>' | '<' | "=="
+OPREL       :	"==" | '>' | ">=" | '<' | "<="
             ;
 			
-OPLOG		:	'&' | '|'
+OPLOG		:	"&&" | "||"
 			;
 
 OP			:	'+' | '-'

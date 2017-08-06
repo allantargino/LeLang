@@ -42,24 +42,25 @@ public LeLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("nextfor", this), new Integer(28));
 	literals.put(new ANTLRHashString("Write", this), new Integer(19));
-	literals.put(new ANTLRHashString("for", this), new Integer(23));
+	literals.put(new ANTLRHashString("for", this), new Integer(26));
 	literals.put(new ANTLRHashString("if", this), new Integer(21));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
-	literals.put(new ANTLRHashString("while", this), new Integer(29));
+	literals.put(new ANTLRHashString("while", this), new Integer(24));
 	literals.put(new ANTLRHashString(")", this), new Integer(18));
 	literals.put(new ANTLRHashString("Read", this), new Integer(16));
-	literals.put(new ANTLRHashString("endif", this), new Integer(22));
+	literals.put(new ANTLRHashString("endif", this), new Integer(23));
 	literals.put(new ANTLRHashString("{", this), new Integer(6));
 	literals.put(new ANTLRHashString("cte", this), new Integer(10));
+	literals.put(new ANTLRHashString("else", this), new Integer(22));
 	literals.put(new ANTLRHashString("(", this), new Integer(17));
-	literals.put(new ANTLRHashString("true", this), new Integer(33));
-	literals.put(new ANTLRHashString(":", this), new Integer(26));
+	literals.put(new ANTLRHashString("true", this), new Integer(34));
+	literals.put(new ANTLRHashString(":", this), new Integer(29));
+	literals.put(new ANTLRHashString("next", this), new Integer(25));
 	literals.put(new ANTLRHashString("bool", this), new Integer(14));
 	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
 	literals.put(new ANTLRHashString("int", this), new Integer(11));
-	literals.put(new ANTLRHashString("false", this), new Integer(34));
+	literals.put(new ANTLRHashString("false", this), new Integer(35));
 	literals.put(new ANTLRHashString("}", this), new Integer(7));
 	literals.put(new ANTLRHashString("str", this), new Integer(13));
 }
@@ -256,7 +257,7 @@ tryAgain:
 		
 		match('#');
 		{
-		_loop40:
+		_loop41:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -295,7 +296,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop40;
+				break _loop41;
 			}
 			}
 		} while (true);
@@ -346,7 +347,7 @@ tryAgain:
 		}
 		}
 		{
-		_loop44:
+		_loop45:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -385,7 +386,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop44;
+				break _loop45;
 			}
 			}
 		} while (true);
@@ -403,34 +404,34 @@ tryAgain:
 		int _saveIndex;
 		
 		{
-		int _cnt47=0;
-		_loop47:
+		int _cnt48=0;
+		_loop48:
 		do {
 			if (((LA(1) >= '0' && LA(1) <= '9'))) {
 				matchRange('0','9');
 			}
 			else {
-				if ( _cnt47>=1 ) { break _loop47; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+				if ( _cnt48>=1 ) { break _loop48; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 			}
 			
-			_cnt47++;
+			_cnt48++;
 		} while (true);
 		}
 		{
 		if ((LA(1)=='.')) {
 			match('.');
 			{
-			int _cnt50=0;
-			_loop50:
+			int _cnt51=0;
+			_loop51:
 			do {
 				if (((LA(1) >= '0' && LA(1) <= '9'))) {
 					matchRange('0','9');
 				}
 				else {
-					if ( _cnt50>=1 ) { break _loop50; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
+					if ( _cnt51>=1 ) { break _loop51; } else {throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());}
 				}
 				
-				_cnt50++;
+				_cnt51++;
 			} while (true);
 			}
 			match('f');
@@ -453,7 +454,7 @@ tryAgain:
 		
 		match('"');
 		{
-		_loop53:
+		_loop54:
 		do {
 			switch ( LA(1)) {
 			case 'a':  case 'b':  case 'c':  case 'd':
@@ -492,7 +493,7 @@ tryAgain:
 			}
 			default:
 			{
-				break _loop53;
+				break _loop54;
 			}
 			}
 		} while (true);
@@ -510,27 +511,25 @@ tryAgain:
 		_ttype = OPREL;
 		int _saveIndex;
 		
-		switch ( LA(1)) {
-		case '>':
-		{
-			match('>');
-			break;
+		if ((LA(1)=='>') && (LA(2)=='=')) {
+			match(">=");
 		}
-		case '<':
-		{
-			match('<');
-			break;
+		else if ((LA(1)=='<') && (LA(2)=='=')) {
+			match("<=");
 		}
-		case '=':
-		{
+		else if ((LA(1)=='=')) {
 			match("==");
-			break;
 		}
-		default:
-		{
+		else if ((LA(1)=='>') && (true)) {
+			match('>');
+		}
+		else if ((LA(1)=='<') && (true)) {
+			match('<');
+		}
+		else {
 			throw new NoViableAltForCharException((char)LA(1), getFilename(), getLine(), getColumn());
 		}
-		}
+		
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));
@@ -546,12 +545,12 @@ tryAgain:
 		switch ( LA(1)) {
 		case '&':
 		{
-			match('&');
+			match("&&");
 			break;
 		}
 		case '|':
 		{
-			match('|');
+			match("||");
 			break;
 		}
 		default:

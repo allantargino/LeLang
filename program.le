@@ -3,7 +3,7 @@ program myProgram
 	# variable declaration
 	int a, b, c;
 	int x, y;
-	cte int d:=3, e:=3;
+	cte int d:=89, e:=77;
 	int numero;
 	decimal myDec;
 
@@ -12,9 +12,24 @@ program myProgram
 	b:=4;
 	myDec:=3.14f;
 
+	Write("Digite um numero ");
 	Read(c);
 
-	if(2 > c)
-		numero:= a + c;
+	if(c>2 && a>2)
+		Write("if1");
+		if(c > 2)
+			Write("if2");
+		else
+			Write("else2");
+		endif
+	else
+		Write("else1");
 	endif
+
+	while(c>2)
+		Write("while ");
+		c := c - 1;
+	next
+
+	Write("Fim do programa");
 }

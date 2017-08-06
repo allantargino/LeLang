@@ -1,3 +1,5 @@
+package lelang.models;
+
 public class Variable
 {
     public static final int BOOLEAN = 1;

@@ -1,3 +1,5 @@
+package lelang.util;
+
 public class Beautifier {
 
     private String _text;

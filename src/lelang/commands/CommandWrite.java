@@ -1,3 +1,7 @@
+package lelang.commands;
+
+import lelang.models.*;
+
 public class CommandWrite extends Command {
     public static final int TYPE_TEXT = 1;
     public static final int TYPE_ID = 2;

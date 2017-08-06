@@ -1,3 +1,7 @@
+package lelang.commands;
+
+import lelang.models.*;
+
 import java.util.ArrayList;
 
 public class ProgramStructure extends CommandReceiver {

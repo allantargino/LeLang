@@ -15,6 +15,9 @@ import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
 
 	import java.util.*;
+	import lelang.commands.*;
+	import lelang.models.*;
+	import lelang.util.*;
 
 public class LeParser extends antlr.LLkParser       implements LeParserTokenTypes
  {
@@ -31,7 +34,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	private String _logicalExpression;
 	
 	// Error Fields
-	private ArrayList<Error> _errorList;
+	private ArrayList<LeError> _errorList;
 
 
 	// Code Writing
@@ -47,7 +50,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		_varFrom=0;
 		_varTo=null;
 
-		_errorList = new ArrayList<Error>();
+		_errorList = new ArrayList<LeError>();
 
 		_cmdStack = new Stack<Command>();
 		_programStructure = new ProgramStructure();
@@ -57,7 +60,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	//Error Handling Methods
 
 	private void CreateError(int code, String message){
-		Error e = new Error(code, 0, message);
+		LeError e = new LeError(code, 0, message);
 		_errorList.add(e);
 	}
 
@@ -66,7 +69,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		if(size > 0)
 		{
 			System.out.println(size + " ERRORS DURING ANALYSIS:");
-			for (Error e: _errorList) System.out.println(e.toString());
+			for (LeError e: _errorList) System.out.println(e.toString());
 		}
 		//TODO: Save in a output file
 	}

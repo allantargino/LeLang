@@ -1,6 +1,7 @@
 import java.io.*;
+import lelang.util.*;
 
-public class MainClass {
+public class LeCompiler {
     public static void main(String args[]) {
         try {
             LeLexer lexer = new LeLexer(new FileInputStream(new File("program.le")));

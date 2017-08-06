@@ -1,3 +1,7 @@
+package lelang.commands;
+
+import lelang.models.*;
+
 public class CommandRead extends Command {
 
     private Variable _variable;

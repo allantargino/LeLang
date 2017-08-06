@@ -1,3 +1,5 @@
+package lelang.commands;
+
 public abstract class Command {
     private StringBuilder _strBuilder;
 

@@ -1,3 +1,5 @@
+package lelang.commands;
+
 import java.util.ArrayList;
 
 public class CommandIf extends CommandReceiver {

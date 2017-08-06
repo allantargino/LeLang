@@ -1,6 +1,6 @@
 # LeProgrammingLanguage
 
-
+```py
 program MyProgram
 {
 	# declaracao de variaveis
@@ -8,7 +8,7 @@ program MyProgram
 	bool f;
 	cte int c:=3, d:=3;
 
-	\# corpo do programa
+	# corpo do programa
 	a:=3;
 	b:=5;
 	f:=true;
@@ -19,3 +19,4 @@ program MyProgram
 	if(f)
 	endif
 }
+```

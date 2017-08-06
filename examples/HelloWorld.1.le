@@ -1,0 +1,42 @@
+program myProgram
+{
+	# variable declaration
+	int a, b;
+	int x, y;
+	bool f;
+	cte int c:=3, d:=3;
+	int numero;
+	decimal myDec;
+	str name;
+	str outro;
+
+	# program body
+	a:=3+5+90;
+	b:=4;
+	f:=false;
+
+	myDec:=3.14f;
+
+	f:=true;
+	Write(f);
+
+	name:="allan";
+	name:="emily";
+
+	numero:= 3.14f;
+	
+	# Commands
+	Write("Digite um numero ");
+	Read(x);
+	Write("Digite outro numero ");
+	Read(y);
+	Write("Digite um nome ");
+	Read(outro);
+	Write(outro);
+	Write(name);
+	Write(myDec);
+	Write("fim");
+
+	if(f)
+	endif
+}

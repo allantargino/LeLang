@@ -19,16 +19,13 @@ public class CommandWhile extends CommandReceiver {
     }
 
     public String WriteCode() {
-        StringBuilder str = new StringBuilder();
-        str.append("while(").append(_logicalExpression).append("){\n");
-
+        AppendLine("while(" + _logicalExpression + "){");
         if (!_commandList.isEmpty()) {
             for (Command c : _commandList) {
-                str.append("\t\t").append(c.WriteCode());
+                AppendLine(c.WriteCode());
             }
         }
-
-        str.append("\t}\n");
-        return str.toString();
+        AppendLine("}");
+        return GetCommandCode();
     }
 }

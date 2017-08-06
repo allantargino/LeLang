@@ -4,11 +4,11 @@ import lelang.models.*;
 
 import java.util.ArrayList;
 
-public class ProgramStructure extends CommandReceiver {
+public class CommandProgram extends CommandReceiver {
     ArrayList<Variable> varList;
     ArrayList<Command> comandos;
 
-    public ProgramStructure() {
+    public CommandProgram() {
         this.varList = new ArrayList<Variable>();
         this.comandos = new ArrayList<Command>();
     }

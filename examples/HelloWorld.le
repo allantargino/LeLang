@@ -1,42 +1,36 @@
 program myProgram
 {
 	# variable declaration
-	int a, b;
+	int a, b, c;
 	int x, y;
-	bool f;
-	cte int c:=3, d:=3;
+	cte int d:=89, e:=77;
 	int numero;
 	decimal myDec;
-	str name;
-	str outro;
 
 	# program body
 	a:=3+5+90;
 	b:=4;
-	f:=false;
-
 	myDec:=3.14f;
 
-	f:=true;
-	Write(f);
-
-	name:="allan";
-	name:="emily";
-
-	numero:= 3.14f;
-	
-	# Commands
 	Write("Digite um numero ");
-	Read(x);
-	Write("Digite outro numero ");
-	Read(y);
-	Write("Digite um nome ");
-	Read(outro);
-	Write(outro);
-	Write(name);
-	Write(myDec);
-	Write("fim");
+	Read(c);
 
-	if(f)
+	if(c>2 && a>2)
+		Write("if1");
+		if(c > 2)
+			Write("if2");
+		else
+			Write("else2");
+		endif
+	else
+		Write("else1");
 	endif
+
+	while(c>2)
+		Write("while ");
+		c := c - 1;
+	next
+
+	Write("Allan");
+	Write("Fim do programa");
 }

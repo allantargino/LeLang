@@ -33,8 +33,9 @@ public class CommandRead extends Command {
             if(_variable.GetType()!=Variable.STRING)
                 line += "&";
             line += _variable.GetId();
-            line += ");\n";
-            return line;
+            line += ");";
+            AppendLine(line);
+            return GetCommandCode();
         } else {
             throw new RuntimeException("Variable value must be set");
         }

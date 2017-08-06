@@ -4,53 +4,33 @@ int main()
 {
 	int a;
 	int b;
-	int const c = 3;
-	int const d = 3;
+	int c;
+	int const d = 89;
 	int numero;
-	bool f;
+	int const e = 77;
 	int x;
-	char* name;
-	char* outro;
 	int y;
 	float myDec;
 	a= 3 + 5 + 90;
-	
 	b= 4;
-	
-	f= false;
-	
 	myDec= 3.14f;
-	
-	f= true;
-	
-	printf("%d", f);
-	
-	name= "allan";
-	
-	name= "emily";
-	
 	printf("Digite um numero ");
-	
-	scanf("%d", &x);
-
-	printf("Digite outro numero ");
-	
-	scanf("%d", &y);
-
-	printf("Digite um nome ");
-	
-	scanf("%s", outro);
-
-	printf("%s", outro);
-	
-	printf("%s", name);
-	
-	printf("%.6f", myDec);
-	
-	printf("fim");
-	
-		if(f){
-}
-
-		return 0;
+	scanf("%d", &c);
+	if( c > 2  && a > 2 ){
+		printf("if1");
+		if( c > 2 ){
+			printf("if2");
+		}else{
+			printf("else2");
+		}
+	}else{
+		printf("else1");
+	}
+	while( c > 2 ){
+		printf("while ");
+		c= c - 1;
+	}
+	printf("Allan");
+	printf("Fim do programa");
+	return 0;
 }

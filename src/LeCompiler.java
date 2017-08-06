@@ -17,7 +17,7 @@ public class LeCompiler {
             Beautifier beautifier = new Beautifier(code);
             String beautyCode = beautifier.BeautifyCCode();
 
-            WriteFileCode(beautyCode, output);
+            WriteFileContent(beautyCode, output);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (Exception ex) {
@@ -25,7 +25,7 @@ public class LeCompiler {
         }
     }
 
-    private static void WriteFileCode(String text, String output) throws Exception {
+    private static void WriteFileContent(String text, String output) throws Exception {
         File file = new File(output);
         FileOutputStream stream = new FileOutputStream(file);
 

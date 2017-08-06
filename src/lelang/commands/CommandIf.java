@@ -30,23 +30,21 @@ public class CommandIf extends CommandReceiver {
     }
 
     public String WriteCode() {
-        StringBuilder str = new StringBuilder();
-        str.append("if(").append(_logicalExpression).append("){\n");
-
+        AppendLine("if(" + _logicalExpression + "){\n");
         if (!_trueCommandList.isEmpty()) {
             for (Command c : _trueCommandList) {
-                str.append(c.WriteCode());
+                AppendLine(c.WriteCode());
             }
         }
 
         if (!_falseCommandList.isEmpty()) {
-            str.append("}else{\n");
+            AppendLine("}else{\n");
             for (Command c : _falseCommandList) {
-                str.append(c.WriteCode());
+                AppendLine(c.WriteCode());
             }
         }
 
-        str.append("}\n");
-        return str.toString();
+        AppendLine("}\n");
+        return GetCommandCode();
     }
 }

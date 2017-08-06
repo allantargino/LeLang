@@ -28,7 +28,7 @@ options{
 
 	// Code Writing
 	private Command _cmd;
-	private ProgramStructure _programStructure;
+	private CommandProgram _program;
 	private Stack<Command> _cmdStack;
 
 	public void Init(){
@@ -42,7 +42,7 @@ options{
 		_errorList = new ArrayList<LeError>();
 
 		_cmdStack = new Stack<Command>();
-		_programStructure = new ProgramStructure();
+		_program = new CommandProgram();
 	}
 
 
@@ -148,7 +148,7 @@ options{
 
 	private void AddGlobalCommand(){
 		if(_cmdStack.empty())
-			_programStructure.AddCommand(_cmd);
+			_program.AddCommand(_cmd);
 		else
 			((CommandReceiver)_cmdStack.peek()).AddCommand(_cmd);
 	}
@@ -158,7 +158,7 @@ options{
 	}
 
 	public String GetCode(){
-		return _programStructure.WriteCode();
+		return _program.WriteCode();
 	}
 }
 
@@ -168,7 +168,7 @@ program : 	"program" ID "{"
 				{
 					_endOfAssignment = true;
 					for (Variable v : _symbolTable.values()) {
-						_programStructure.AddVariable(v);
+						_program.AddVariable(v);
 					}
 				}
 				block
@@ -212,7 +212,7 @@ type	:	("int" | "decimal" | "str"| "bool")
 block	:	(cmd)*
 		;
 
-cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdWhile | cmdFor
+cmd		:	cmdAttr | cmdRead | cmdWrite | cmdIf | cmdWhile
 		;
 
 cmdAttr	:	ID
@@ -307,11 +307,6 @@ cmdWhile:	"while"
 				")"
 				block
 			"next" { _cmdStack.pop(); }
-		;
-		
-		
-cmdFor	:	"for" AP NUM ":" NUM FP
-			"next"
 		;
 
 boolExpr:	{ _logicalExpression = "";}

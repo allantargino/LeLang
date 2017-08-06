@@ -8,7 +8,7 @@ public abstract class Command {
     }
 
     protected void AppendLine(String text) {
-        _strBuilder.append(text).append("\n\r");
+        _strBuilder.append(text).append("\n");
     }
 
     protected String GetCommandCode() {

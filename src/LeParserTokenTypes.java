@@ -14,7 +14,7 @@ public interface LeParserTokenTypes {
 	int LITERAL_decimal = 12;
 	int LITERAL_str = 13;
 	int LITERAL_bool = 14;
-	int IG = 15;
+	// ":=" = 15
 	int LITERAL_Read = 16;
 	// "(" = 17
 	// ")" = 18
@@ -37,4 +37,5 @@ public interface LeParserTokenTypes {
 	int FC = 35;
 	int AP = 36;
 	int FP = 37;
+	int IG = 38;
 }

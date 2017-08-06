@@ -12,7 +12,7 @@
 - [x] Comentários
 - [x] Tipos Booleanos
 - [x] C Beautifier
-- [ ] Tratamento de erros
+- [x] Tratamento de erros
     - [ ] Erros do Antlr
     - [ ] Erros do Le
     - [ ] Avisos
@@ -21,4 +21,5 @@
 ### Passos:
 
 - [ ] Otimizações de código
+- [ ] Appends
 - [ ] Organização de código (herança e reaproveimento de código)

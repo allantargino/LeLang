@@ -7,6 +7,7 @@
 
 class LeParser extends Parser;
 options{
+	defaultErrorHandler=false;
     k = 2;
 }
 
@@ -23,7 +24,7 @@ options{
 	private String _logicalExpression;
 	
 	// Error Fields
-	private ArrayList<LeError> _errorList;
+	private ErrorHandler _errorHandler;
 
 
 	// Code Writing
@@ -39,7 +40,7 @@ options{
 		_varFrom=0;
 		_varTo=null;
 
-		_errorList = new ArrayList<LeError>();
+		_errorHandler = new ErrorHandler();
 
 		_cmdStack = new Stack<Command>();
 		_program = new CommandProgram();
@@ -48,21 +49,18 @@ options{
 
 	//Error Handling Methods
 
+	private int GetLineNumber(){
+		LeLexer lexer =  ((LeLexer) inputState.getInput().getInput());
+		return lexer.GetLineNumber();
+	}
+
 	private void CreateError(int code, String message){
-		LeError e = new LeError(code, 0, message);
-		_errorList.add(e);
+		_errorHandler.AddError(ErrorCategory.Default, code, GetLineNumber(), message);
 	}
 
-	public void ErrorHandling(){
-		int size = _errorList.size();
-		if(size > 0)
-		{
-			System.out.println(size + " ERRORS DURING ANALYSIS:");
-			for (LeError e: _errorList) System.out.println(e.toString());
-		}
-		//TODO: Save in a output file
+	public ErrorHandler GetErrorHandler(){
+		return this._errorHandler;
 	}
-
 
 	//Variable Handling Methods
 
@@ -95,7 +93,7 @@ options{
 	
 	private Boolean CheckVariableAssignment(){
 		if(_varFrom > _varTo.GetType()){
-			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types.");
+			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types");
 			return false;
 		}else{
 			return true;
@@ -107,7 +105,7 @@ options{
 		if (v != null){
 			return v;
 		}else{
-			throw new RuntimeException("Variable not declared.");
+			throw new RuntimeException("Variable not declared");
 		}
 	}
 
@@ -119,7 +117,7 @@ options{
 	private Boolean CheckVariableIsConst(){
 		if (_varTo.IsConst()){
 			if(_endOfAssignment)
-				CreateError(4, "Variable " + _varTo.GetId() +  " is a constant and cannot be assign.");
+				CreateError(4, "Variable " + _varTo.GetId() +  " is a constant and cannot be assign");
 			return true;
 		}else{
 			return false;
@@ -128,7 +126,7 @@ options{
 
 	private Boolean CheckVariableIsConst(Variable v){
 		if (v.IsConst()){
-			CreateError(5, "Variable " + _varTo.GetId() +  " is a constant and cannot be used in Read command.");
+			CreateError(5, "Variable " + _varTo.GetId() +  " is a constant and cannot be used in Read command");
 			return true;
 		}else{
 			return false;
@@ -139,7 +137,7 @@ options{
 		if (v.GetType()==Variable.BOOLEAN){
 			return true;
 		}else{
-			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool.");
+			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool");
 			return false;
 		}
 	}
@@ -226,7 +224,7 @@ cmdAttr	:	ID
 			PV
 		;
 	   
-attr	:	IG
+attr	:	":="
 				{
 					_varFrom = 0;
 				}
@@ -379,25 +377,28 @@ boolVal:	"true" | "false"
 		
 class LeLexer extends Lexer;
 options{
+	defaultErrorHandler=false;
 	caseSensitive = true;
 	k=2;
 }
+
 {
-	public int _errorLine = 0;
+	private int _line = 1;
+
+	public int GetLineNumber(){
+		return _line;
+	}
 }
 
 BLANK       :	( 	  ' '
-					| '\n'
-						{
-							_errorLine++;
-						}
+					| '\n' {_line++;}
 					| '\r'
 					| '\t'
 				)
 				{ _ttype=Token.SKIP; }
             ;
 
-COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.SKIP;}
+COMMENT		:	'#' ('a'..'z' | 'A'..'Z' | ' ' | '0'..'9')* '\r' '\n'  {_ttype=Token.SKIP; _line++;}
 			;
 
 ID          :	('a'..'z' |'A'..'Z') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*

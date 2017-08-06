@@ -34,7 +34,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	private String _logicalExpression;
 	
 	// Error Fields
-	private ArrayList<LeError> _errorList;
+	private ErrorHandler _errorHandler;
 
 
 	// Code Writing
@@ -50,7 +50,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		_varFrom=0;
 		_varTo=null;
 
-		_errorList = new ArrayList<LeError>();
+		_errorHandler = new ErrorHandler();
 
 		_cmdStack = new Stack<Command>();
 		_program = new CommandProgram();
@@ -59,21 +59,18 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 
 	//Error Handling Methods
 
+	private int GetLineNumber(){
+		LeLexer lexer =  ((LeLexer) inputState.getInput().getInput());
+		return lexer.GetLineNumber();
+	}
+
 	private void CreateError(int code, String message){
-		LeError e = new LeError(code, 0, message);
-		_errorList.add(e);
+		_errorHandler.AddError(ErrorCategory.Default, code, GetLineNumber(), message);
 	}
 
-	public void ErrorHandling(){
-		int size = _errorList.size();
-		if(size > 0)
-		{
-			System.out.println(size + " ERRORS DURING ANALYSIS:");
-			for (LeError e: _errorList) System.out.println(e.toString());
-		}
-		//TODO: Save in a output file
+	public ErrorHandler GetErrorHandler(){
+		return this._errorHandler;
 	}
-
 
 	//Variable Handling Methods
 
@@ -106,7 +103,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	
 	private Boolean CheckVariableAssignment(){
 		if(_varFrom > _varTo.GetType()){
-			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types.");
+			CreateError(3, "Variable " + _varTo.GetId() +  " cannot received this operation with the current invalid types");
 			return false;
 		}else{
 			return true;
@@ -118,7 +115,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		if (v != null){
 			return v;
 		}else{
-			throw new RuntimeException("Variable not declared.");
+			throw new RuntimeException("Variable not declared");
 		}
 	}
 
@@ -130,7 +127,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 	private Boolean CheckVariableIsConst(){
 		if (_varTo.IsConst()){
 			if(_endOfAssignment)
-				CreateError(4, "Variable " + _varTo.GetId() +  " is a constant and cannot be assign.");
+				CreateError(4, "Variable " + _varTo.GetId() +  " is a constant and cannot be assign");
 			return true;
 		}else{
 			return false;
@@ -139,7 +136,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 
 	private Boolean CheckVariableIsConst(Variable v){
 		if (v.IsConst()){
-			CreateError(5, "Variable " + _varTo.GetId() +  " is a constant and cannot be used in Read command.");
+			CreateError(5, "Variable " + _varTo.GetId() +  " is a constant and cannot be used in Read command");
 			return true;
 		}else{
 			return false;
@@ -150,7 +147,7 @@ public class LeParser extends antlr.LLkParser       implements LeParserTokenType
 		if (v.GetType()==Variable.BOOLEAN){
 			return true;
 		}else{
-			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool.");
+			CreateError(6, "Variable " + _varTo.GetId() +  " is not bool");
 			return false;
 		}
 	}
@@ -198,614 +195,500 @@ public LeParser(ParserSharedInputState state) {
 	public final void program() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_program);
-			match(ID);
-			match(6);
-			declare();
-			
-								_endOfAssignment = true;
-								for (Variable v : _symbolTable.values()) {
-									_program.AddVariable(v);
-								}
-							
-			block();
-			match(7);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_0);
-		}
+		match(LITERAL_program);
+		match(ID);
+		match(6);
+		declare();
+		
+							_endOfAssignment = true;
+							for (Variable v : _symbolTable.values()) {
+								_program.AddVariable(v);
+							}
+						
+		block();
+		match(7);
 	}
 	
 	public final void declare() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
+		{
+		_loop4:
+		do {
+			switch ( LA(1)) {
+			case LITERAL_int:
+			case LITERAL_decimal:
+			case LITERAL_str:
+			case LITERAL_bool:
 			{
-			_loop4:
-			do {
-				switch ( LA(1)) {
-				case LITERAL_int:
-				case LITERAL_decimal:
-				case LITERAL_str:
-				case LITERAL_bool:
-				{
-					var();
-					break;
-				}
-				case LITERAL_cte:
-				{
-					cte();
-					break;
-				}
-				default:
-				{
-					break _loop4;
-				}
-				}
-			} while (true);
+				var();
+				break;
 			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_1);
+			case LITERAL_cte:
+			{
+				cte();
+				break;
+			}
+			default:
+			{
+				break _loop4;
+			}
+			}
+		} while (true);
 		}
 	}
 	
 	public final void block() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			{
-			_loop15:
-			do {
-				if ((_tokenSet_2.member(LA(1)))) {
-					cmd();
-				}
-				else {
-					break _loop15;
-				}
-				
-			} while (true);
+		{
+		_loop15:
+		do {
+			if ((_tokenSet_0.member(LA(1)))) {
+				cmd();
 			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_3);
+			else {
+				break _loop15;
+			}
+			
+		} while (true);
 		}
 	}
 	
 	public final void var() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			type();
-			_varType = Variable.GetTypeNumber(LT(0).getText());
-			match(ID);
-			CheckAndDeclareVariable(LT(0).getText(), false);
-			{
-			_loop7:
-			do {
-				if ((LA(1)==VG)) {
-					match(VG);
-					match(ID);
-					CheckAndDeclareVariable(LT(0).getText(), false);
-				}
-				else {
-					break _loop7;
-				}
-				
-			} while (true);
+		type();
+		_varType = Variable.GetTypeNumber(LT(0).getText());
+		match(ID);
+		CheckAndDeclareVariable(LT(0).getText(), false);
+		{
+		_loop7:
+		do {
+			if ((LA(1)==VG)) {
+				match(VG);
+				match(ID);
+				CheckAndDeclareVariable(LT(0).getText(), false);
 			}
-			match(PV);
+			else {
+				break _loop7;
+			}
+			
+		} while (true);
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_4);
-		}
+		match(PV);
 	}
 	
 	public final void cte() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_cte);
-			type();
-			_varType = Variable.GetTypeNumber(LT(0).getText());
-			match(ID);
-			
-								if(CheckAndDeclareVariable(LT(0).getText(), true)){
-									_varTo = GetVariable(LT(0).getText());
-								}
-							
-			attr();
-			_varTo.SetExpression(_mathExpression);
-			{
-			_loop10:
-			do {
-				if ((LA(1)==VG)) {
-					match(VG);
-					match(ID);
-					
-											if(CheckAndDeclareVariable(LT(0).getText(), true)){
-												_varTo = GetVariable(LT(0).getText());
-											}
-										
-					attr();
-					_varTo.SetExpression(_mathExpression);
-				}
-				else {
-					break _loop10;
-				}
+		match(LITERAL_cte);
+		type();
+		_varType = Variable.GetTypeNumber(LT(0).getText());
+		match(ID);
+		
+							if(CheckAndDeclareVariable(LT(0).getText(), true)){
+								_varTo = GetVariable(LT(0).getText());
+							}
+						
+		attr();
+		_varTo.SetExpression(_mathExpression);
+		{
+		_loop10:
+		do {
+			if ((LA(1)==VG)) {
+				match(VG);
+				match(ID);
 				
-			} while (true);
+										if(CheckAndDeclareVariable(LT(0).getText(), true)){
+											_varTo = GetVariable(LT(0).getText());
+										}
+									
+				attr();
+				_varTo.SetExpression(_mathExpression);
 			}
-			match(PV);
+			else {
+				break _loop10;
+			}
+			
+		} while (true);
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_4);
-		}
+		match(PV);
 	}
 	
 	public final void type() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			{
-			switch ( LA(1)) {
-			case LITERAL_int:
-			{
-				match(LITERAL_int);
-				break;
-			}
-			case LITERAL_decimal:
-			{
-				match(LITERAL_decimal);
-				break;
-			}
-			case LITERAL_str:
-			{
-				match(LITERAL_str);
-				break;
-			}
-			case LITERAL_bool:
-			{
-				match(LITERAL_bool);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
+		{
+		switch ( LA(1)) {
+		case LITERAL_int:
+		{
+			match(LITERAL_int);
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_5);
+		case LITERAL_decimal:
+		{
+			match(LITERAL_decimal);
+			break;
+		}
+		case LITERAL_str:
+		{
+			match(LITERAL_str);
+			break;
+		}
+		case LITERAL_bool:
+		{
+			match(LITERAL_bool);
+			break;
+		}
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
+		}
+		}
 		}
 	}
 	
 	public final void attr() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(IG);
-			
-								_varFrom = 0;
-							
-			cmdExpr();
-			
-								if(CheckVariableAssignment() && !CheckVariableIsConst())
-								{
-									((CommandAssign) _cmd).SetToVariable(_varTo);
-									((CommandAssign) _cmd).SetExpression(_mathExpression);
-									AddGlobalCommand();
-								}
-							
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_6);
-		}
+		match(15);
+		
+							_varFrom = 0;
+						
+		cmdExpr();
+		
+							if(CheckVariableAssignment() && !CheckVariableIsConst())
+							{
+								((CommandAssign) _cmd).SetToVariable(_varTo);
+								((CommandAssign) _cmd).SetExpression(_mathExpression);
+								AddGlobalCommand();
+							}
+						
 	}
 	
 	public final void cmd() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			switch ( LA(1)) {
-			case ID:
-			{
-				cmdAttr();
-				break;
-			}
-			case LITERAL_Read:
-			{
-				cmdRead();
-				break;
-			}
-			case LITERAL_Write:
-			{
-				cmdWrite();
-				break;
-			}
-			case LITERAL_if:
-			{
-				cmdIf();
-				break;
-			}
-			case LITERAL_while:
-			{
-				cmdWhile();
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
+		switch ( LA(1)) {
+		case ID:
+		{
+			cmdAttr();
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
+		case LITERAL_Read:
+		{
+			cmdRead();
+			break;
+		}
+		case LITERAL_Write:
+		{
+			cmdWrite();
+			break;
+		}
+		case LITERAL_if:
+		{
+			cmdIf();
+			break;
+		}
+		case LITERAL_while:
+		{
+			cmdWhile();
+			break;
+		}
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
+		}
 		}
 	}
 	
 	public final void cmdAttr() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(ID);
-			
-								if(CheckVariableCanBeUsed(LT(0).getText())){
-									_varTo = GetVariable(LT(0).getText());
-									_cmd = new CommandAssign();					
-								}
-							
-			attr();
-			match(PV);
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
+		match(ID);
+		
+							if(CheckVariableCanBeUsed(LT(0).getText())){
+								_varTo = GetVariable(LT(0).getText());
+								_cmd = new CommandAssign();					
+							}
+						
+		attr();
+		match(PV);
 	}
 	
 	public final void cmdRead() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_Read);
-			match(17);
-			_cmd = new CommandRead();
-			match(ID);
-			
-								String varName = LT(0).getText();
-								if(CheckVariableCanBeUsed(varName)){
-									Variable v = _symbolTable.get(varName);
-									if(!CheckVariableIsConst(v)){
-										((CommandRead) _cmd).SetVariable(v);
-									}
+		match(LITERAL_Read);
+		match(17);
+		_cmd = new CommandRead();
+		match(ID);
+		
+							String varName = LT(0).getText();
+							if(CheckVariableCanBeUsed(varName)){
+								Variable v = _symbolTable.get(varName);
+								if(!CheckVariableIsConst(v)){
+									((CommandRead) _cmd).SetVariable(v);
 								}
-							
-			match(18);
-			match(PV);
-			
-							AddGlobalCommand();
+							}
 						
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
+		match(18);
+		match(PV);
+		
+						AddGlobalCommand();
+					
 	}
 	
 	public final void cmdWrite() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_Write);
-			match(17);
-			_cmd = new CommandWrite();
-			{
-			switch ( LA(1)) {
-			case TEXTO:
-			{
-				match(TEXTO);
-				((CommandWrite) _cmd).SetContent(LT(0).getText());
-				break;
-			}
-			case ID:
-			{
-				match(ID);
-				
-										String varName = LT(0).getText();
-										if(CheckVariableCanBeUsed(varName)){
-											Variable v = _symbolTable.get(varName);
-											((CommandWrite) _cmd).SetType(CommandWrite.TYPE_ID);
-											((CommandWrite) _cmd).SetVariable(v);
-										}
-									
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
-			match(18);
-			match(PV);
+		match(LITERAL_Write);
+		match(17);
+		_cmd = new CommandWrite();
+		{
+		switch ( LA(1)) {
+		case TEXTO:
+		{
+			match(TEXTO);
+			((CommandWrite) _cmd).SetContent(LT(0).getText());
+			break;
+		}
+		case ID:
+		{
+			match(ID);
 			
-							AddGlobalCommand();
-						
+									String varName = LT(0).getText();
+									if(CheckVariableCanBeUsed(varName)){
+										Variable v = _symbolTable.get(varName);
+										((CommandWrite) _cmd).SetType(CommandWrite.TYPE_ID);
+										((CommandWrite) _cmd).SetVariable(v);
+									}
+								
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
 		}
+		}
+		}
+		match(18);
+		match(PV);
+		
+						AddGlobalCommand();
+					
 	}
 	
 	public final void cmdIf() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_if);
-			
-								_cmd = new CommandIf();
-								AddGlobalCommand();
-								_cmdStack.push(_cmd);
-							
-			match(17);
-			boolExpr();
-			((CommandIf)_cmd).SetLogicalExpression(_logicalExpression);
-			match(18);
+		match(LITERAL_if);
+		
+							_cmd = new CommandIf();
+							AddGlobalCommand();
+							_cmdStack.push(_cmd);
+						
+		match(17);
+		boolExpr();
+		((CommandIf)_cmd).SetLogicalExpression(_logicalExpression);
+		match(18);
+		block();
+		{
+		switch ( LA(1)) {
+		case LITERAL_else:
+		{
+			match(LITERAL_else);
+			((CommandIf) _cmdStack.peek()).SetElseFlag(true);
 			block();
-			{
-			switch ( LA(1)) {
-			case LITERAL_else:
-			{
-				match(LITERAL_else);
-				((CommandIf) _cmdStack.peek()).SetElseFlag(true);
-				block();
-				break;
-			}
-			case LITERAL_endif:
-			{
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
-			}
-			match(LITERAL_endif);
-			_cmdStack.pop();
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
+		case LITERAL_endif:
+		{
+			break;
 		}
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
+		}
+		}
+		}
+		match(LITERAL_endif);
+		_cmdStack.pop();
 	}
 	
 	public final void cmdWhile() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			match(LITERAL_while);
-			
-								_cmd = new CommandWhile();
-								AddGlobalCommand();
-								_cmdStack.push(_cmd);
-							
-			match(17);
-			boolExpr();
-			((CommandWhile)_cmd).SetLogicalExpression(_logicalExpression);
-			match(18);
-			block();
-			match(LITERAL_next);
-			_cmdStack.pop();
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_7);
-		}
+		match(LITERAL_while);
+		
+							_cmd = new CommandWhile();
+							AddGlobalCommand();
+							_cmdStack.push(_cmd);
+						
+		match(17);
+		boolExpr();
+		((CommandWhile)_cmd).SetLogicalExpression(_logicalExpression);
+		match(18);
+		block();
+		match(LITERAL_next);
+		_cmdStack.pop();
 	}
 	
 	public final void cmdExpr() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			_mathExpression = "";
-			termo();
-			
-								_mathExpression += " " + LT(0).getText();
-							
-			exprl();
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_8);
-		}
+		_mathExpression = "";
+		termo();
+		
+							_mathExpression += " " + LT(0).getText();
+						
+		exprl();
 	}
 	
 	public final void boolExpr() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			_logicalExpression = "";
-			boolCond();
-			{
-			_loop27:
-			do {
-				if ((LA(1)==OPLOG)) {
-					match(OPLOG);
-					_logicalExpression += " " + LT(0).getText();
-					boolCond();
-				}
-				else {
-					break _loop27;
-				}
-				
-			} while (true);
+		_logicalExpression = "";
+		boolCond();
+		{
+		_loop27:
+		do {
+			if ((LA(1)==OPLOG)) {
+				match(OPLOG);
+				_logicalExpression += " " + LT(0).getText();
+				boolCond();
 			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_9);
+			else {
+				break _loop27;
+			}
+			
+		} while (true);
 		}
 	}
 	
 	public final void boolCond() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			{
-			if ((_tokenSet_10.member(LA(1))) && (LA(2)==OPREL||LA(2)==OP)) {
-				cmdExpr();
-				_logicalExpression+=_mathExpression;
-				match(OPREL);
-				_logicalExpression+= " " + LT(0).getText();
-				cmdExpr();
-				_logicalExpression+=_mathExpression + " ";
-			}
-			else if ((LA(1)==ID) && (LA(2)==18||LA(2)==OPLOG)) {
-				match(ID);
-				
-										if(CheckVariableCanBeUsed(LT(0).getText())){
-											Variable v = GetVariable(LT(0).getText());
-											if(CheckVariableIsBoolean(v)){
-												_logicalExpression+=v.GetId();
-											}
-										}
-									
-			}
-			else if ((LA(1)==LITERAL_true||LA(1)==LITERAL_false) && (LA(2)==18||LA(2)==OPLOG)) {
-				boolVal();
-				_logicalExpression+=LT(0).getText();
-			}
-			else {
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			
-			}
+		{
+		if ((_tokenSet_1.member(LA(1))) && (LA(2)==OPREL||LA(2)==OP)) {
+			cmdExpr();
+			_logicalExpression+=_mathExpression;
+			match(OPREL);
+			_logicalExpression+= " " + LT(0).getText();
+			cmdExpr();
+			_logicalExpression+=_mathExpression + " ";
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_11);
+		else if ((LA(1)==ID) && (LA(2)==18||LA(2)==OPLOG)) {
+			match(ID);
+			
+									if(CheckVariableCanBeUsed(LT(0).getText())){
+										Variable v = GetVariable(LT(0).getText());
+										if(CheckVariableIsBoolean(v)){
+											_logicalExpression+=v.GetId();
+										}
+									}
+								
+		}
+		else if ((LA(1)==LITERAL_true||LA(1)==LITERAL_false) && (LA(2)==18||LA(2)==OPLOG)) {
+			boolVal();
+			_logicalExpression+=LT(0).getText();
+		}
+		else {
+			throw new NoViableAltException(LT(1), getFilename());
+		}
+		
 		}
 	}
 	
 	public final void boolVal() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			switch ( LA(1)) {
-			case LITERAL_true:
-			{
-				match(LITERAL_true);
-				break;
-			}
-			case LITERAL_false:
-			{
-				match(LITERAL_false);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
+		switch ( LA(1)) {
+		case LITERAL_true:
+		{
+			match(LITERAL_true);
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_12);
+		case LITERAL_false:
+		{
+			match(LITERAL_false);
+			break;
+		}
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
+		}
 		}
 	}
 	
 	public final void termo() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			switch ( LA(1)) {
-			case ID:
-			{
-				match(ID);
-				
-									if(CheckVariableCanBeUsed(LT(0).getText())){
-										Variable v = GetVariable(LT(0).getText());
-										SetMaxType(v.GetType());
-									}
-								
-				break;
-			}
-			case NUM:
-			{
-				match(NUM);
-				
-									if(NumberIsDecimal(LT(0).getText()))
-										SetMaxType(Variable.DECIMAL);
-									else
-										SetMaxType(Variable.INTEGER);
-								
-				break;
-			}
-			case TEXTO:
-			{
-				match(TEXTO);
-				SetMaxType(Variable.STRING);
-				break;
-			}
-			case LITERAL_true:
-			case LITERAL_false:
-			{
-				boolVal();
-				SetMaxType(Variable.BOOLEAN);
-				break;
-			}
-			default:
-			{
-				throw new NoViableAltException(LT(1), getFilename());
-			}
-			}
+		switch ( LA(1)) {
+		case ID:
+		{
+			match(ID);
+			
+								if(CheckVariableCanBeUsed(LT(0).getText())){
+									Variable v = GetVariable(LT(0).getText());
+									SetMaxType(v.GetType());
+								}
+							
+			break;
 		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_12);
+		case NUM:
+		{
+			match(NUM);
+			
+								if(NumberIsDecimal(LT(0).getText()))
+									SetMaxType(Variable.DECIMAL);
+								else
+									SetMaxType(Variable.INTEGER);
+							
+			break;
+		}
+		case TEXTO:
+		{
+			match(TEXTO);
+			SetMaxType(Variable.STRING);
+			break;
+		}
+		case LITERAL_true:
+		case LITERAL_false:
+		{
+			boolVal();
+			SetMaxType(Variable.BOOLEAN);
+			break;
+		}
+		default:
+		{
+			throw new NoViableAltException(LT(1), getFilename());
+		}
 		}
 	}
 	
 	public final void exprl() throws RecognitionException, TokenStreamException {
 		
 		
-		try {      // for error handling
-			{
-			_loop33:
-			do {
-				if ((LA(1)==OP)) {
-					match(OP);
-					
-										_mathExpression += " " + LT(0).getText();
-									
-					termo();
-					
-										_mathExpression += " " + LT(0).getText();
-									
-				}
-				else {
-					break _loop33;
-				}
+		{
+		_loop33:
+		do {
+			if ((LA(1)==OP)) {
+				match(OP);
 				
-			} while (true);
+									_mathExpression += " " + LT(0).getText();
+								
+				termo();
+				
+									_mathExpression += " " + LT(0).getText();
+								
 			}
-		}
-		catch (RecognitionException ex) {
-			reportError(ex);
-			recover(ex,_tokenSet_8);
+			else {
+				break _loop33;
+			}
+			
+		} while (true);
 		}
 	}
 	
@@ -826,7 +709,7 @@ public LeParser(ParserSharedInputState state) {
 		"\"decimal\"",
 		"\"str\"",
 		"\"bool\"",
-		"IG",
+		"\":=\"",
 		"\"Read\"",
 		"\"(\"",
 		"\")\"",
@@ -848,73 +731,19 @@ public LeParser(ParserSharedInputState state) {
 		"AC",
 		"FC",
 		"AP",
-		"FP"
+		"FP",
+		"IG"
 	};
 	
 	private static final long[] mk_tokenSet_0() {
-		long[] data = { 2L, 0L};
+		long[] data = { 19464224L, 0L};
 		return data;
 	}
 	public static final BitSet _tokenSet_0 = new BitSet(mk_tokenSet_0());
 	private static final long[] mk_tokenSet_1() {
-		long[] data = { 19464352L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
-	private static final long[] mk_tokenSet_2() {
-		long[] data = { 19464224L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_2 = new BitSet(mk_tokenSet_2());
-	private static final long[] mk_tokenSet_3() {
-		long[] data = { 46137472L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_3 = new BitSet(mk_tokenSet_3());
-	private static final long[] mk_tokenSet_4() {
-		long[] data = { 19496096L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_4 = new BitSet(mk_tokenSet_4());
-	private static final long[] mk_tokenSet_5() {
-		long[] data = { 32L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_5 = new BitSet(mk_tokenSet_5());
-	private static final long[] mk_tokenSet_6() {
-		long[] data = { 768L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_6 = new BitSet(mk_tokenSet_6());
-	private static final long[] mk_tokenSet_7() {
-		long[] data = { 65601696L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_7 = new BitSet(mk_tokenSet_7());
-	private static final long[] mk_tokenSet_8() {
-		long[] data = { 201589504L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_8 = new BitSet(mk_tokenSet_8());
-	private static final long[] mk_tokenSet_9() {
-		long[] data = { 262144L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_9 = new BitSet(mk_tokenSet_9());
-	private static final long[] mk_tokenSet_10() {
 		long[] data = { 3759144992L, 0L};
 		return data;
 	}
-	public static final BitSet _tokenSet_10 = new BitSet(mk_tokenSet_10());
-	private static final long[] mk_tokenSet_11() {
-		long[] data = { 67371008L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_11 = new BitSet(mk_tokenSet_11());
-	private static final long[] mk_tokenSet_12() {
-		long[] data = { 470024960L, 0L};
-		return data;
-	}
-	public static final BitSet _tokenSet_12 = new BitSet(mk_tokenSet_12());
+	public static final BitSet _tokenSet_1 = new BitSet(mk_tokenSet_1());
 	
 	}

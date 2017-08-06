@@ -9,7 +9,7 @@ program myProgram
 
 	# program body
 	a:=3+5+90;
-	b:=4;
+
 	myDec:=3.14f;
 
 	Write("Digite um numero ");
@@ -30,6 +30,10 @@ program myProgram
 		Write("while ");
 		c := c - 1;
 	next
+
+	d:= 8;
+
+	d
 
 	Write("Allan");
 	Write("Fim do programa");

@@ -11,7 +11,7 @@ LITERAL_int="int"=11
 LITERAL_decimal="decimal"=12
 LITERAL_str="str"=13
 LITERAL_bool="bool"=14
-IG=15
+":="=15
 LITERAL_Read="Read"=16
 "("=17
 ")"=18
@@ -34,3 +34,4 @@ AC=34
 FC=35
 AP=36
 FP=37
+IG=38

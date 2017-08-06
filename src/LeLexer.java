@@ -27,7 +27,11 @@ import antlr.SemanticException;
 public class LeLexer extends antlr.CharScanner implements LeParserTokenTypes, TokenStream
  {
 
-	public int _errorLine = 0;
+	private int _line = 1;
+
+	public int GetLineNumber(){
+		return _line;
+	}
 public LeLexer(InputStream in) {
 	this(new ByteBuffer(in));
 }
@@ -42,25 +46,26 @@ public LeLexer(LexerSharedInputState state) {
 	caseSensitiveLiterals = true;
 	setCaseSensitive(true);
 	literals = new Hashtable();
-	literals.put(new ANTLRHashString("else", this), new Integer(22));
-	literals.put(new ANTLRHashString(")", this), new Integer(18));
-	literals.put(new ANTLRHashString("if", this), new Integer(21));
 	literals.put(new ANTLRHashString("Write", this), new Integer(19));
-	literals.put(new ANTLRHashString("int", this), new Integer(11));
-	literals.put(new ANTLRHashString("true", this), new Integer(30));
-	literals.put(new ANTLRHashString("str", this), new Integer(13));
-	literals.put(new ANTLRHashString("next", this), new Integer(25));
-	literals.put(new ANTLRHashString("false", this), new Integer(31));
-	literals.put(new ANTLRHashString("cte", this), new Integer(10));
-	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
-	literals.put(new ANTLRHashString("}", this), new Integer(7));
+	literals.put(new ANTLRHashString("if", this), new Integer(21));
 	literals.put(new ANTLRHashString("program", this), new Integer(4));
 	literals.put(new ANTLRHashString("while", this), new Integer(24));
-	literals.put(new ANTLRHashString("(", this), new Integer(17));
-	literals.put(new ANTLRHashString("bool", this), new Integer(14));
+	literals.put(new ANTLRHashString(")", this), new Integer(18));
 	literals.put(new ANTLRHashString("Read", this), new Integer(16));
-	literals.put(new ANTLRHashString("{", this), new Integer(6));
 	literals.put(new ANTLRHashString("endif", this), new Integer(23));
+	literals.put(new ANTLRHashString("{", this), new Integer(6));
+	literals.put(new ANTLRHashString("cte", this), new Integer(10));
+	literals.put(new ANTLRHashString("else", this), new Integer(22));
+	literals.put(new ANTLRHashString("(", this), new Integer(17));
+	literals.put(new ANTLRHashString("true", this), new Integer(30));
+	literals.put(new ANTLRHashString("next", this), new Integer(25));
+	literals.put(new ANTLRHashString("bool", this), new Integer(14));
+	literals.put(new ANTLRHashString("decimal", this), new Integer(12));
+	literals.put(new ANTLRHashString("int", this), new Integer(11));
+	literals.put(new ANTLRHashString("false", this), new Integer(31));
+	literals.put(new ANTLRHashString("}", this), new Integer(7));
+	literals.put(new ANTLRHashString("str", this), new Integer(13));
+	literals.put(new ANTLRHashString(":=", this), new Integer(15));
 }
 
 public Token nextToken() throws TokenStreamException {
@@ -219,9 +224,7 @@ tryAgain:
 		case '\n':
 		{
 			match('\n');
-			
-										_errorLine++;
-									
+			_line++;
 			break;
 		}
 		case '\r':
@@ -301,7 +304,7 @@ tryAgain:
 		}
 		match('\r');
 		match('\n');
-		_ttype=Token.SKIP;
+		_ttype=Token.SKIP; _line++;
 		if ( _createToken && _token==null && _ttype!=Token.SKIP ) {
 			_token = makeToken(_ttype);
 			_token.setText(new String(text.getBuffer(), _begin, text.length()-_begin));

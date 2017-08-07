@@ -1,4 +1,4 @@
-# LeProgrammingLanguage
+# Le Programming Language
 
 ### Requirements
 * You must have JDK installed on your machine.

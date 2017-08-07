@@ -1,0 +1,17 @@
+program myProgram
+{
+	# variable declaration
+	int x, y, z;
+	str name;
+
+	# program body
+	Write("Type a number");
+	Read(x);
+	Write("Type another number ");
+	Read(y);
+	Write("Digite um nome ");
+	Read(name);
+	
+	z:= x + y;
+	Write(z);
+}

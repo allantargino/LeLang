@@ -4,10 +4,10 @@ echo "- STARTING..."
 input="../examples/HelloWorld.le"
 output="../examples/HelloWorld.c"
 
+# Cleaning old files
 find . -type f -name '*.class' -delete
-
-find . -type f -name 'LeLexer.*' -delete
-find . -type f -name 'LeParser.*' -delete
+find . -type f -name 'LeLexer*' -delete
+find . -type f -name 'LeParser*' -delete
 
 java -cp ./antlr/antlr.jar antlr.Tool grammar.g
 echo "- PARSER AND LEXER GENERATED."

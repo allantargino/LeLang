@@ -1,40 +1,14 @@
 program myProgram
 {
 	# variable declaration
-	int a, b, c;
-	int x, y;
-	cte int d:=89, e:=77;
-	int numero;
-	decimal myDec;
+	int x, z;
+	cte int factor:=100;
 
 	# program body
-	a:=3+5+90;
+	Write("Type a number ");
+	Read(x);
 
-	myDec:=3.14f;
+	z:= x * factor;
 
-	Write("Digite um numero ");
-	Read(c);
-
-	if(c>2 && a>2)
-		Write("if1");
-		if(c > 2)
-			Write("if2");
-		else
-			Write("else2");
-		endif
-	else
-		Write("else1");
-	endif
-
-	while(c>2)
-		Write("while ");
-		c := c - 1;
-	next
-
-	d:= 8;
-
-	d
-
-	Write("Allan");
-	Write("Fim do programa");
+	Write(factor);
 }

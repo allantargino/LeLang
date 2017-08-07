@@ -2,22 +2,21 @@ program myProgram
 {
 	# variable declaration
 	int a, b, c;
-	int x, y;
+	bool x;
+	int a;
 	cte int d:=89, e:=77;
 	int numero;
 	decimal myDec;
 
 	# program body
 	a:=3+5+90;
-	b:=4;
+
 	myDec:=3.14f;
-
-	Write("Digite um numero ");
-	Read(c);
-
+	myDec:="text";
+       
 	if(c>2 && a>2)
 		Write("if1");
-		if(c > 2)
+		if(myDec)
 			Write("if2");
 		else
 			Write("else2");
@@ -25,11 +24,18 @@ program myProgram
 	else
 		Write("else1");
 	endif
+	
+	Write(something);
+	Read(d);
 
 	while(c>2)
 		Write("while ");
 		c := c - 1;
 	next
 
-	Write("Fim do programa");
+	d:= 8;
+	randomWrongThing
+
+	Write("Your Name");
+	Write("The End");
 }

@@ -36,9 +36,9 @@ public class LeError {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(this._category).append(","); //Category
-        sb.append(this._code).append(","); //Code
-        sb.append(this._message).append(","); //Message
+        sb.append(this._category).append(";"); //Category
+        sb.append(this._code).append(";"); //Code
+        sb.append(this._message).append(";"); //Message
         sb.append(this._line); //Line
         return sb.toString();
     }

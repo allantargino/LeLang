@@ -1,0 +1,5 @@
+<ExpR>          ->  <Exp>  ( "!="  | ">="  | ">="  | "<"   | ">" ) <Exp> )?
+<Exp>           ->  <Prod> ( ( "+" | "-" ) <Prod> )*
+
+<Prod>          ->  <Val>  ( ( "*" | "/" ) <Val>  )*
+<Val>      ->  ( <ID> | <STRING> | <NUMBER>  | <BOOL> ) | "(" <Expr> ")"
